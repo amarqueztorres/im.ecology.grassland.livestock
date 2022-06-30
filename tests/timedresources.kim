@@ -1,0 +1,28 @@
+worldview im;
+
+//@test(
+//    name = "resources.temporal.multiple",
+//    description  = "",
+//    observations = ("change in earth:PrecipitationVolume"),
+//    assertions = ()
+//)
+//observe earth:Region named timedresources
+//	over space(shape = "EPSG:4326 POLYGON ((-3.82707753604614 43.29561791511222, -3.6993008893624872 43.29561791511222, -3.6993008893624872 43.34132526393162, -3.82707753604614 43.34132526393162, -3.82707753604614 43.29561791511222)))", 
+//			grid="25 m"),
+//	     time(start=2010-01-01, end=2020-01-01);
+//		
+//@time(step=1.month, start=2018, end=3018)
+//model 
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec1,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec2,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec3,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec4,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec5,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec6,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec7,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec8,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec9,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec10,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec11,
+//	local:amarquez:im.ecology.grassland.livestock:spain.meanprec12
+//  as change in earth:PrecipitationVolume;

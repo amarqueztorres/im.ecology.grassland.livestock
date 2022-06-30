@@ -1,0 +1,514 @@
+namespace ecology.grassland.livestockingestion
+	using (T_FANTIN_C, T_FANTIN_M, T_MAT_C, T_MAT_M)  
+		from ecology.grassland.livestock.tables;
+
+//-------------------------------------------- tables --------------------------------------------//
+
+number mat_c
+'Probability of accessibility and livestock movement through vegetation'
+	observing
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	lookup (com2) into T_MAT_C; 
+
+number mat_m
+'Probability of accessibility and livestock movement through vegetation'
+	observing
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	lookup (com2) into T_MAT_M; 
+	
+//-------------------------------------------- constant --------------------------------------------//
+
+model im:Maximum proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:IngestedFood named selectmax 
+'Proportion of living biomass that allows the livestock to select only living vegetation'
+	set to 0.9;
+	
+model im:Minimum proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:IngestedFood named selectmin //during biology.incubation:Ingestion
+'Proportion of living biomass that prevents the livestock from selecting living vegetation'
+	set to 0.2;	
+
+number linf_c 
+'Amount of aerial biomass that prevents grazing'
+	set to 50;
+	
+number lsup_c 
+'Amount of aerial biomass that allows grazing'
+	set to 120;
+	
+number linf_m 
+'Amount of aerial biomass that prevents grazing'
+	set to 30;
+	
+number lsup_m 
+'Amount of aerial biomass that allows grazing'
+	set to 90;
+
+number ingmax_c 
+'Maximum ingestion'
+	set to 13.55;
+	
+number ingmax_m 
+	'Maximum ingestion'
+set to 15.25;
+
+number kp
+'Parameter that indicates the slope when the function of the model "proportion of Cattle IngestedFood caused by Slope" is 0.5'
+	set to 25;
+	
+number np 
+'Parameter indicating the decrease in the "proportion of feed intake by livestock caused by the slope" model when the slope increases'
+	set to 5;
+
+number lintg
+'Amount of biomass below which there is no intake'
+	set to 26.8; //# Biomasa de pasto (g/m2) por debajo de la cual no hay ingesti?n
+
+number ccimx 
+'Body condition at minimal potential intake '
+	set to 2.5;  //#CC por debajo de la cual la ingesti?n potencial es m?xima
+
+number ccimn 
+'Body condition at minimal potential intake '
+	set to 3.5;  //#CC a la que la ingesti?n potencial es m?nima
+
+number primn 
+'Proportion of potential intake to “ccimn” model'
+	set to 0.5;  //#Proporci?n de la ingesti?n potencial a ccImn
+
+//-------------------------------------------- function --------------------------------------------//
+
+number corcci_c
+'Function to calculate the livestock body condition'
+	observing
+		value of agriculture:Cattle agriculture.incubation:BodyCondition 0 to 5 named cca,
+		ccimx,
+		ccimn,
+		primn
+	set to [(cca < ccimx) ? 1 : (
+		(cca > ccimn) ? 0.5 : (1+ ((1-primn)/(ccimx-ccimn)) * (cca-ccimx)))];
+		
+number corcci_m
+'Function to calculate the livestock body condition'
+	observing
+		value of agriculture.incubation:Mares agriculture.incubation:BodyCondition 0 to 5 named ccm,
+		ccimx,
+		ccimn,
+		primn
+	set to [(ccm < ccimx) ? 1 : (
+		(ccm>ccimn) ? 0.5 : (1+ ((1-primn)/(ccimx-ccimn)) * (ccm-ccimx)))];
+
+
+
+//-------------------------------------------- models --------------------------------------------//	
+
+//--- 1) [N] digestible
+
+@intensive(space) 
+model chemistry:Nitrogen im:Mass of agriculture:Cattle biology.incubation:Digestion in g/m^2 named ndig_c 
+'Digestible nitrogen mass of standing vegetation'
+	observing
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digv_c, //Digestibilidad de la biomasa aï¿½rea viva
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digm_c, //Digestibilidad de la biomasa aï¿½rea muerta
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm,
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov,// in g/m^2 
+		not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom
+	set to [def a = digv_c*npla*biov
+			def b = digm_c*npla*prtvm*biom
+			def result = a+b
+			return result]; 
+
+@intensive(space) 
+model chemistry:Nitrogen im:Mass of agriculture.incubation:Mares biology.incubation:Digestion in g/m^2 named ndig_m 
+'Digestible nitrogen mass of standing vegetation'
+	observing
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digv_m, //Digestibilidad de la biomasa aï¿½rea viva
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digm_m, //Digestibilidad de la biomasa aï¿½rea muerta
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm,
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov,// in g/m^2 
+		not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom
+	set to [def a = digv_m*npla*biov
+			def b = digm_m*npla*prtvm*biom
+			def result = a+b
+			return result
+	]; 
+
+//--- 2) Fantin
+
+ number fantin_c
+"Maximum proportion of (0-1) a type of grass can be part of the animal's daily diet"
+	observing
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	lookup (com2) into T_FANTIN_C; 
+
+number fantin_m
+"Maximum proportion of (0-1) a type of grass can be part of the animal's daily diet"
+	observing
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	lookup (com2) into T_FANTIN_M; 
+ 
+ 
+ //--- 3) Fmos
+ 
+number im0
+'Level of shrub intake with minimal livestock accessibility'
+	set to 0;
+	
+number im1
+'Level of shrub intake with maximal livestock accessibility'
+	set to 0.6;
+	
+number fmos0
+'Minimum accessibility of livestock'
+	set to 0;
+
+model proportion of landcover:ScrubHerbaceousVegetation causing agriculture:Cattle im:Movement named im_c 
+'Level of livestock accessibility due to the proportion of shrubs (0: no shrubs, 1: maximum proportion of shrubs)'
+	observing 
+		mat_c 
+	set to [1 - mat_c];
+		
+model proportion of landcover:ScrubHerbaceousVegetation causing agriculture.incubation:Mares im:Movement named im_m
+'Level of livestock accessibility due to the proportion of shrubs (0: no shrubs, 1: maximum proportion of shrubs)'
+	observing
+		mat_m 
+	set to [1 - mat_m];
+	
+model proportion of agriculture:Cattle biology.incubation:Ingestion caused by landcover:ScrubHerbaceousVegetation named fmos_c
+'Difficulty of livestock access due to excess shrub growth (0: not accessible; 1 : fully accessible)'
+	observing
+		fmos0,
+		im1,
+		proportion of landcover:ScrubHerbaceousVegetation causing agriculture:Cattle im:Movement named im_c
+	set to [(im_c < fmos0) ? fmos0 : (
+		 		(im_c > im1) ? 1 : (im_c/im1))];
+
+model proportion of agriculture.incubation:Mares biology.incubation:Ingestion caused by landcover:ScrubHerbaceousVegetation named fmos_m
+'Difficulty of livestock access due to excess shrub growth (0: not accessible; 1 : fully accessible)'
+	observing
+		fmos0,
+		im1,
+		proportion of landcover:ScrubHerbaceousVegetation causing agriculture.incubation:Mares im:Movement named im_m
+	set to [(im_m < fmos0) ? fmos0 : (
+		 		(im_m > im1) ? 1 : (im_m/im1))];
+
+	  		
+//--- 4)  sel
+
+@intensive(space)
+model ecology:AboveGroundBiomass in g/m^2 named msu
+'Standing above ground biomass (living and non-living)'
+	observing 
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov,
+		not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom
+	set to [biov+biom];
+	
+@intensive(space)
+model proportion of biology.incubation:Living ecology:AboveGroundBiomass named prbiov
+'Proportion of living above ground biomass'
+	observing
+		ecology:AboveGroundBiomass in g/m^2 named msu,
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov
+	set to [(msu == 0) ? 0 : (biov/(msu))];
+
+
+//--- 5)  ch
+
+@intensive(space)
+number ch_c 
+'Coefficient (0-1) of regulation of livestock intake according to available biomass'
+	observing 
+		ecology:AboveGroundBiomass in g/m^2 named msu,
+		linf_c,
+		lsup_c
+	set to [(msu < linf_c) ?
+	         		0
+	         	:  ((msu > lsup_c) ?
+	                1
+	            :
+	                (-1*(linf_c - msu))/(lsup_c - linf_c))];
+
+
+@intensive(space)
+number ch_m
+'Coefficient (0-1) of regulation of livestock intake according to available biomass'
+	observing 
+		ecology:AboveGroundBiomass in g/m^2 named msu,
+		linf_m,
+		lsup_m
+	set to [(msu < linf_m) ?
+	         		0
+	         	:  ((msu > lsup_m) ?
+	                1
+	            :
+	                (-1*(linf_m - msu))/(lsup_m - linf_m))];
+
+
+//--- 6)  ipend
+
+/*
+ * VALOR PASTORAL
+ */ 
+
+@intensive(space) 
+model proportion of agriculture:Cattle biology.incubation:IngestedFood caused by geography:Slope named ipend_c
+'Coefficient (0-1) of grazing capacity according to slope'
+	observing
+		geography:Slope named pend,//percentage of geography:Slope named pend,
+		kp,
+		np
+	set to [1-(Math.pow(pend, np)/ (Math.pow(pend, np) + Math.pow(kp, np)))];
+
+@intensive(space)
+model proportion of agriculture.incubation:Mares biology.incubation:IngestedFood caused by geography:Slope named ipend_m
+'Coefficient (0-1) of grazing capacity according to slope'
+	observing
+		geography:Slope named pend,//percentage of geography:Slope named pend,
+		kp,
+		np
+	set to [1-(Math.pow(pend, np)/ (Math.pow(pend, np) + Math.pow(kp, np)))];
+	
+number selectt
+'Coefficient (0-1) indicating the livestock ability to select the living against the dead part of the vegetation'
+ observing
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass named prbiov, 
+		selectmin, 
+		selectmax
+	set to [(prbiov < selectmin) ? 0 : (
+		         (prbiov > selectmax) ? 1 :
+                (-1*(selectmin-prbiov))/(selectmax-selectmin))];
+	
+ @intensive(space)
+model value of agriculture:Cattle landcover:Pastureland named vp_c
+'Dimensionless index allowing estimation of pasture quality according to its composition'
+	observing
+		ch_c, 
+		fantin_c, 
+		selectt,
+		proportion of agriculture:Cattle biology.incubation:IngestedFood caused by geography:Slope named ipend_c, 
+		proportion of agriculture:Cattle biology.incubation:Ingestion caused by landcover:ScrubHerbaceousVegetation named fmos_c, 
+		chemistry:Nitrogen im:Mass of agriculture:Cattle biology.incubation:Digestion in g/m^2 named ndig_c		
+	set to [ch_c*fantin_c*selectt*ipend_c*fmos_c*ndig_c]; 
+
+ 
+ @intensive(space)			
+model value of agriculture.incubation:Mares landcover:Pastureland named vp_m
+'Dimensionless index allowing estimation of pasture quality according to its composition'
+	observing
+		ch_m, 
+		fantin_m, 
+		proportion of agriculture.incubation:Mares biology.incubation:IngestedFood caused by geography:Slope named ipend_m, 
+		selectt,
+		proportion of agriculture.incubation:Mares biology.incubation:Ingestion caused by landcover:ScrubHerbaceousVegetation named fmos_m,
+		chemistry:Nitrogen im:Mass of agriculture:Cattle biology.incubation:Digestion in g/m^2 named ndig_m		
+	set to [ndig_m*ch_m*fantin_m*fmos_m*ipend_m*selectt];
+
+
+//---------------------- B) INGESTION ----------------------//
+
+//--- 1) DIAS
+
+model proportion of agriculture:Cattle biology.incubation:IngestedFood named diashift0_c
+'Estimates the proportion of grazing if there were no overlap with others’ herds'
+	observing
+		value of agriculture:Cattle landcover:Pastureland named vp
+	set to [(vp == 0) ? 0 : 1];
+
+model proportion of agriculture.incubation:Mares biology.incubation:IngestedFood named diashift0_m
+'Estimates the proportion of grazing if there were no overlap with others’ herds'
+	observing
+		value of agriculture.incubation:Mares landcover:Pastureland named vpm
+		set to [(vpm == 0) ? 0 : 1];
+		
+
+//--- 2) IMaxht 
+
+@intensive(space)
+model im:Potential ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in kg/ha named imaxht_c 
+'Potential ingestion without biomass limitation'
+	observing
+		corcci_c,
+		count of biology:Individual agriculture:Cattle in ha named n,
+		ingmax_c //in kg
+	set to [n*ingmax_c*corcci_c];
+
+@intensive(space)	
+model im:Potential ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in kg/ha named imaxht_m
+'Potential ingestion without biomass limitation'
+	observing
+		corcci_m,
+		count of biology:Individual agriculture.incubation:Mares in ha named n,
+		ingmax_m
+	set to [n*ingmax_m*corcci_m];
+	
+
+//--- 3) PP (PPhift)
+
+@intensive(space)
+number pphift_c
+'Potential of total grazing proportion of a given pasture corresponding to a herd'
+	observing
+		im:Potential ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in kg/ha named imaxht_c,
+		diashift0_c 
+	set to [imaxht_c*diashift0_c];
+
+@intensive(space)
+number pphift_m
+'Potential of total grazing proportion of a given pasture corresponding to a herd'
+	observing
+		im:Potential ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in kg/ha named imaxht_m,
+		diashift0_m 
+	set to [imaxht_m*diashift0_m];
+
+//--- 4) CIR
+
+number cirhift01_c
+'Potential of total intake proportion corresponding to type of grass'
+	observing
+		diashift0_c,
+		pphift_c
+	set to [diashift0_c*pphift_c];
+	
+number cirhift01_m
+'Potential of total intake proportion corresponding to type of grass'
+	observing
+		diashift0_m,
+		pphift_m
+	set to [diashift0_m*pphift_m];
+
+
+//--- 5) CIR2
+
+model proportion of ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Ingestion named cirhift02_c
+"Real proportion of the herd's ingestion corresponding to type of grass"
+	observing
+		cirhift01_c,
+		ch_c
+	set to [(cirhift01_c <= ch_c) ? cirhift01_c : ch_c];
+				
+model proportion of ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Ingestion named cirhift02_m
+"Real proportion of the herd's ingestion corresponding to type of grass"
+	observing
+		cirhift01_m,
+		ch_m
+	set to [(cirhift01_m <= ch_m) ? cirnum_m : ch_m];
+
+//--- 6) ihcift
+
+@intensive(space)
+model ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in kg/ha named ihcift_c
+'Amount of above ground biomass ingested by each type of livestock'
+	observing
+		proportion of ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Ingestion named cirhift02_c,
+		im:Potential ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in kg/ha named imaxhct_c
+	set to [imaxhct_c*cirhift02_c];
+
+
+@intensive(space)
+model ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in kg/ha named ihcift_m 
+'Amount of above ground biomass ingested by each type of livestock'
+	observing
+		proportion of ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Ingestion named cirhift02,
+		im:Potential ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in kg/ha named imaxhct_m
+	set to [imaxhct_m*cirhift02];
+
+
+@intensive(space)
+number tri_ivhc
+'Function to calculate ingestion model'
+	observing
+		ecology:AboveGroundBiomass in g/m^2 named msu,
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov,
+		im:Maximum proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:IngestedFood named selectmax,
+		im:Minimum proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:IngestedFood named selectmin
+	set to [(biov/msu)<selectmin ? 0 : (
+				(biov/msu)>selectmax ? 1 : (-1*(selectmin-(biov/msu)))/(selectmax-selectmin))];
+
+
+model biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named ivhcift_c
+'Living above ground biomass ingested by each type of livestock'
+	observing
+		tri_ivhc,
+		ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in kg named ihcift_c
+	set to [ihcift_c*tri_ivhc];
+
+
+model biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named ivhcift_m
+'Living above ground biomass ingested by each type of livestock'
+	observing
+		tri_ivhc,
+		ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion named ihcift_m
+	set to [ihcift_m*tri_ivhc];
+
+ 			
+model landcover:Pastureland biology.incubation:Living ecology:AboveGroundBiomass causing biology.incubation:Ingestion in g named ivift
+'Living above ground biomass ingested by livestock'
+	observing
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named ivhcift_c,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named ivhcift_m
+	set to [ivhcift_c + ivhcift_m];
+
+
+model not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named imhcift_c
+'Non-living above ground biomass ingested by each type of livestock'
+	observing
+		ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion named ihcift_c,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion named ivhcift_c
+	set to [ihcift_c-ivhcift_c];
+
+model not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named imhcift_m
+'Non-living above ground biomass ingested by each type of livestock'
+	observing
+		ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named ihcift_m,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named ivhcift_m
+	set to [ihcift_m-ivhcift_m];
+	
+			
+model landcover:Pastureland not biology.incubation:Living ecology:AboveGroundBiomass causing biology.incubation:Ingestion in g named imift
+'Non-living above ground biomass ingested by livestock'
+	observing
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named imhcift_c,
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named imhcift_m
+	set to [imhcift_c + imhcift_m]; //AREGLAR CUANDO sum
+
+
+model proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:Ingestion named ivgm2ift
+'Proportion of ingested living biomass out of all ingested biomass'
+//	observing
+//		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion named ivhcift,
+//		imgm2ift,
+//		msu,
+//		lintg
+	set to [0];
+	//over time
+		//	set privift to [(ivift+imift==0) ? 0 : (ivift/(ivift+imift))]
+		//	set to [
+				//if (ivgm2ift+imgm2ift> 0){
+					//if(msu - ivgm2ift-imgm2ift) < lintg) {
+						//(msu - lintg) * privift
+					//}else{
+						//ivgm2ift
+					//}else{
+				//0}
+		//];
+
+	
+model proportion of not biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:Ingestion named imgm2ift
+'Proportion of ingested non-living biomass in the whole of the ingested biomass'
+	set to [0];
+	//over time
+	// 	observing
+	// 		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named ivhcift,
+	//		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov,
+	//		not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom,
+	//		lintg
+	//	set primift to [((ivift+imift)==0) ? 0 : (imift/(ivift+imift))]
+	//	set to [
+			//if (ivgm2ift+imgm2ift > 0){
+			//if(msu - ivhcift -ivgm2ift-imgm2ift) < lintg) {
+			//(msu - lintg) * primift
+			//}else{
+			//imgm2ift
+			//}else{
+			//0}
+			//];

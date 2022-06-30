@@ -1,0 +1,298 @@
+namespace ecology.grassland.livestockmass
+	using (T_DIGV_C, T_DIGV_M, T_DIGM_C, T_DIGM_M)
+		from ecology.grassland.livestock.tables;
+
+
+model proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digv_c
+'Digestibility of living aerial biomass'
+	observing
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	lookup (com2) into T_DIGV_C; 
+
+model proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digv_m
+'Digestibility of living aerial biomass'
+	observing
+	type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	lookup (com2) into T_DIGV_M; 
+		
+model proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digm_c
+'Digestibility of non-living aerial biomass'
+	observing
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	lookup (com2) into T_DIGM_C; 
+
+model proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digm_m
+'Digestibility of non-living aerial biomass'
+	observing
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	lookup (com2) into T_DIGM_M;
+	
+//-------------------------------------------- constants --------------------------------------------//		
+
+number eb 
+'Gross energy value'
+	set to 18.4;
+
+number kml1 
+'Efficiency of energy use for lactation'
+	set to 0.28;
+	
+number kreservas
+'Efficiency of metabolizable energy used for food supplies mobilization'
+	set to 0.84;
+	
+number enmovil	
+'Energy value of mobilizing body reserves'
+	set to 22.4;
+
+number egkg 
+'Energy needed to increase 1 kg of body weight'
+	set to 26; 
+
+number kg1 
+'Energy efficiency to gain weight'
+	set to 0.54;
+
+number pv_c 
+''
+	set to 531.25;
+
+number pv_m set to 500;
+
+number km2_c
+'Metabolism energy efficiency for maintenance and mobility'
+	set to 0.5;
+
+number km2_m
+'Metabolism energy efficiency for maintenance and mobility'
+	set to 0.6;
+
+number kg2_c
+'Metabolism energy efficiency for gain weight'
+	set to 0.006;
+
+number kg2_m
+'Metabolism energy efficiency for gain weight'
+	set to 0.1;
+
+number nm_c
+'Livestock energy movement'
+	set to 38.31;
+
+number nd_c
+'Livestock energy mobility'
+	 set to 9.59;
+
+number nm_m
+'Livestock energy movement'
+	set to 36.75;
+
+number nd_m
+'Livestock energy mobility'
+	set to 14.70;
+
+
+//-------------------------------------------- functions --------------------------------------------//
+
+
+model value of agriculture:Cattle agriculture.incubation:BodyCondition 0 to 5 named cc_c
+'Body Condition'
+//	observing
+//		 agriculture:Cattle im:Weight named pvr,
+//		 im:Reference agriculture:Cattle im:Weight named pv
+	set to 2.5;
+//	over time
+//		set to [3+((pvr-pv)*5/pv)];
+//
+model value of agriculture.incubation:Mares agriculture.incubation:BodyCondition 0 to 5 named cc_m
+'Body Condition'
+//	observing
+//		 agriculture.incubation:Mares im:Weight named pvr,
+//		 im:Reference agriculture.incubation:Mares im:Weight named pv
+	set to 2.5;
+////	over time
+////		set to [3+((pvr-pv)*5/pv)];
+
+		
+number corcc_c
+	observing
+		value of agriculture:Cattle agriculture.incubation:BodyCondition 0 to 5 named cc_c
+	set to [1+((cc_c-3)*0.2)];
+
+number corcc_m
+	observing
+		value of agriculture:Cattle agriculture.incubation:BodyCondition 0 to 5 named cc_m
+	set to [1+((cc_m-3)*0.2)];
+
+
+//-------------------------------------------- models --------------------------------------------//	
+
+/*
+ * a) Calculation of Energy (Empirical modelling by McDonald, 1995)
+*/
+
+@intensive(space)
+model agriculture:Cattle im:Energy causing im:Displacement in MJ named nmd2_c
+'Livestock movement and displacement energy'
+	observing
+		nm_c,
+		nd_c,
+		count of biology:Individual agriculture:Cattle in ha named n,
+		corcc_c 
+	set to [(nm_c+nd_c)*corcc_c*n];
+
+@intensive(space)
+model agriculture.incubation:Mares im:Energy causing im:Displacement in MJ named nmd2_m
+'Livestock movement and displacement energy'
+	observing
+		nm_m,
+		nd_m,
+		count of biology:Individual agriculture.incubation:Mares in ha named n_mares,
+		corcc_m 
+	set to [(nm_m+nd_m)*n_mares*corcc_m];
+
+
+model agriculture:Cattle im:Energy caused by biology.incubation:Ingestion in MJ named emi_c
+'Metabolisation of ingested energy in livestock'
+	observing
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named ivhcift_c, 
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named imhcift_c,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digv_c,  
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digm_c, 
+		eb
+	set to [(ivhcift_c*eb*digv_c*0.8)+(imhcift_c*eb*digm_c*0.8)];
+
+
+model agriculture.incubation:Mares im:Energy caused by biology.incubation:Ingestion in MJ named emi_m
+'Metabolisation of ingested energy in livestock'
+	observing
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named ivhcift_m, 
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named imhcift_m,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digv_m,  
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digm_m, 
+		eb		
+	set to [(ivhcift_m*eb*digv_m*0.8)+(imhcift_m*eb*digm_m*0.8)];
+	
+
+model agriculture:Cattle biology.incubation:IngestedFood im:Energy caused by im:Displacement in MJ named enimd_c
+'Ingested energy that implies movement and displacement'
+	observing
+		kml1, 
+		km2_c,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digv_c,  
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digm_c, 
+		eb,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named ivhcift_c,
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named imhcift_c
+	set to [((ivhcift_c*eb*digv_c*0.8)*(kml1*digv_c+km2_c))+((imhcift_c*eb*digm_c*0.8)*(kml1*digm_c+km2_c))];
+
+
+model agriculture.incubation:Mares biology.incubation:IngestedFood im:Energy caused by im:Displacement in MJ named enimd_m
+'Ingested energy that implies movement and displacement'
+	observing
+		kml1,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digv_m, 
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares  biology.incubation:Digestion named digm_m, 
+		eb,
+		km2_m,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named ivhcift_m,
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares  biology.incubation:Ingestion in g named imhcift_m
+	set to [((ivhcift_m*eb*digv_m*0.8)*(kml1*digv_m+km2_m))+((imhcift_m*eb*digm_m*0.8)*(kml1*digm_m+km2_m))];
+
+
+model agriculture:Cattle im:Energy causing im:Changed im:Weight in MJ named enigan_c
+'Ingested energy that implies change of weight'
+	observing
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digv_c, 
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle  biology.incubation:Digestion named digm_c, 
+		eb,
+		kg1,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named ivhcift_c, 
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g named imhcift_c,
+		kg2_c
+	set to [((ivhcift_c*eb*digv_c*0.8)*(kg1*digv_c+kg2_c))+((imhcift_c*eb*digm_c*0.8)*(kg1*digm_c+kg2_c))];
+
+model agriculture.incubation:Mares im:Energy causing im:Changed im:Weight in MJ named enigan_m 
+'Ingested energy that implies change of weight'
+	observing
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digv_m, 
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares  biology.incubation:Digestion named digm_m, 
+		eb,
+		kg1,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named ivhcift_m,
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named imhcift_m,
+		kg2_m
+	set to [((ivhcift_m*eb*digv_m*0.8)*(kg1*digv_m+kg2_m))+((imhcift_m*eb*digm_m*0.8)*(kg1*digm_m+kg2_m))];	
+
+
+/*
+ * b) Balance of energy (Empirical modelling by McDonald, 1995)
+*/
+
+@intensive(space)
+model agriculture:Cattle im:Energy in MJ named emapeso_c
+'Balance between ingested energy and needs'
+	observing
+		agriculture:Cattle im:Energy caused by biology.incubation:Ingestion in MJ named emi_c, 
+		agriculture:Cattle biology.incubation:IngestedFood im:Energy caused by im:Displacement in MJ named enimd_c,
+		agriculture:Cattle im:Energy causing im:Displacement in MJ named nmd2_c
+	set to [def kmprom = (emi_c==0) ? 1 : (enimd_c/emi_c)
+			def result = emi_c-(nmd2_c/kmprom)
+			return result];
+
+model agriculture.incubation:Mares im:Energy in MJ named emapeso_m
+'Balance between ingested energy and needs'
+	observing
+		agriculture.incubation:Mares im:Energy caused by biology.incubation:Ingestion in MJ named emi_m,
+		agriculture.incubation:Mares biology.incubation:IngestedFood im:Energy caused by im:Displacement in MJ named enimd_m,
+		agriculture.incubation:Mares im:Energy causing im:Displacement in MJ named nmd2_m
+	set to [def kmprom = (emi_m==0) ? 1 : (enimd_m/emi_m)
+			def result = emi_m-(nmd2_m/kmprom)
+			return result];
+	
+@intensive(space)
+model agriculture:Cattle im:Weight im:Changed in g/ha named varpesoind_c  
+'Change of weight'
+	observing
+		agriculture:Cattle im:Energy caused by biology.incubation:Ingestion in MJ named emi_c,
+		agriculture:Cattle im:Energy causing im:Changed im:Weight in MJ named enigan_c, 
+		agriculture:Cattle im:Energy in MJ named emapeso_c,
+		egkg,
+		count of biology:Individual agriculture:Cattle in ha named n,
+		kreservas,
+		enmovil
+	set to [def kganprom = (emi_c==0) ? 1 : (enigan_c/emi_c)
+			def a = (emapeso_c < 0) ? (emapeso_c*kreservas/enmovil) : (emapeso_c*kganprom/egkg)
+			def result = a*1000/n
+			return result];
+			
+@intensive(space)
+model agriculture.incubation:Mares im:Weight im:Changed in g/ha named varpesoind_m 
+'Change of weight'
+	observing
+		agriculture.incubation:Mares im:Energy caused by biology.incubation:Ingestion in MJ named emi_m,
+		agriculture.incubation:Mares im:Energy causing im:Changed im:Weight in MJ named enigan_m,
+		agriculture.incubation:Mares im:Energy in MJ named emapeso_m,
+		egkg,
+		count of biology:Individual agriculture.incubation:Mares in ha named n,
+		kreservas,
+		enmovil
+	set to [def kganprom = (emi_m==0) ? 1 : (enigan_m/emi_m)
+			def a = (emapeso_m < 0) ? (emapeso_m*kreservas/enmovil) : (emapeso_m*kganprom/egkg)
+			def result = a*1000/n
+			return result];
+
+@intensive(space)
+model agriculture:Cattle im:Weight in kg/ha named pvr_c   
+	observing
+		agriculture:Cattle im:Weight im:Changed in g/ha named varpesoind_c,
+		im:Reference agriculture:Cattle im:Weight in kg/ha named pv_c
+	set to [pv_c + varpesoind_c];
+
+@intensive(space)
+model agriculture.incubation:Mares im:Weight in kg/ha named pvr_m 
+'Body weight'
+	observing
+		agriculture.incubation:Mares im:Weight im:Changed in g/ha named varpesoind_m,
+		im:Reference agriculture.incubation:Mares im:Weight in kg/ha named pv_m
+	set to [pv_m + varpesoind_m];

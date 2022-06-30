@@ -1,0 +1,86 @@
+namespace ecology.grassland.lf.temp
+	using (T_TC_MIN, T_TC_MAX, T_TC_OPT, T_IDHL)
+			from ecology.grassland.livestock.tables;
+
+
+//-------------------------------------------- tables --------------------------------------------//
+@intensive(space)
+model im:Minimum earth:AtmosphericTemperature causing ecology:Vegetation biology:Growth in Celsius named tc_min
+"Minimum temperature limiting vegetation growth"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_TC_MIN;
+
+@intensive(space)
+model im:Maximum earth:AtmosphericTemperature causing ecology:Vegetation biology:Growth in Celsius named tc_max
+"Minimum temperature limiting vegetation growth"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_TC_MAX;
+
+@intensive(space)
+model earth:AtmosphericTemperature causing im:Maximum ecology:Vegetation biology:Growth in Celsius named topt
+"Optimum temperature for vegetation growth"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_TC_OPT;
+
+model type of ecology.incubation:VegetationStratum named idhl
+"Vertical vegetation stratum coded as 1: ground layer; 2: shrubs layer; 3: midstory layer; 4: canopy layer"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_IDHL;
+
+
+
+
+//-------------------------------------------- models --------------------------------------------//
+
+/*
+ * a) Temperature drivers
+*/
+@intensive(space)
+model earth:AtmosphericTemperature during earth:Snowy im:Season in Celsius named tmedn
+"Mean atmospheric temperature for vegetation in snowy conditions"
+	observing
+		earth:AtmosphericTemperature in Celsius named tmed
+	set to [(tmed < 3) ? 3 : tmed];
+
+@intensive(space)
+model im:Minimum earth:AtmosphericTemperature during earth:Snowy im:Season in Celsius named tminn
+"Minimum atmospheric temperature for vegetation in snowy conditions"
+	observing
+		earth:AtmosphericTemperature in Celsius named tmed,
+		im:Minimum earth:AtmosphericTemperature in Celsius named tmin
+	set to [
+		((tmed < 3) ? 3 : tmin) 
+	];
+
+model earth:AtmosphericTemperature for ecology:Vegetation in Celsius named tmed2 
+"Vegetation temperature under woody plants"
+	observing
+		type of ecology.incubation:VegetationStratum named idhl, 
+		type of im:Relevant landcover:Pastureland biology:Plant named com,
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2,
+		earth:AtmosphericTemperature in Celsius named tmed,
+		earth:AtmosphericTemperature during earth:Snowy im:Season named tmedn 
+	set to [ 
+		if ((idhl == 4) && (com == com2)){
+			tmed
+		}else if (com2 == com) {
+			tmedn
+		}else {
+			(2 + 0.8*tmedn)
+		}];
+
+//-----------------------------FT [0-1] -- effect of temperature on plant growth-----------------------------//
+
+@documented('grassland.atmospherictemperature.vegetationlimiting')
+@intensive(space)
+model percentage of ecology:Vegetation biology:Growth caused by earth:AtmosphericTemperature named ft
+"Limitation of plant growth because of temperature effect. Range from 0 (maximum limitation) to 1 (no growth limitation)"
+	observing
+		im:Minimum earth:AtmosphericTemperature causing ecology:Vegetation biology:Growth in Celsius named tc_min,
+		im:Maximum earth:AtmosphericTemperature causing ecology:Vegetation biology:Growth in Celsius named tc_max,
+		earth:AtmosphericTemperature causing im:Maximum ecology:Vegetation biology:Growth in Celsius named topt,
+		earth:AtmosphericTemperature for ecology:Vegetation in Celsius named tmed2 // in Celsius 
+	set to [
+		(tmed2 < tc_min) ? 0 : ((tmed2 > tc_max) ? 0 :
+			((tc_max-tmed2) / (tc_max-topt)) * Math.pow(((tmed2-tc_min) / (topt-tc_min)), ((topt-tc_min) / (tc_max-topt)))
+		)];

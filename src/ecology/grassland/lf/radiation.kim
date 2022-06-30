@@ -1,0 +1,50 @@
+namespace ecology.grassland.lf.radiation
+	using (T_RC_MAX)
+			from ecology.grassland.livestock.tables;
+
+
+//-------------------------------------------- tables --------------------------------------------//
+
+@intensive(space)
+model im:Maximum earth.incubation:PhotosyntheticallyActiveRadiation in MJ/m^2 named rgc_max
+'Incidence of solar radiation for maximum photosynthetic capacity' 
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_RC_MAX; 
+
+//-------------------------------------------- models --------------------------------------------//
+
+/*
+ * b) Radiation drivers
+*/		
+
+@intensive(space)
+model earth:SolarRadiation for ecology:Vegetation in MJ/m^2 named rg2
+'Real incidence of solar radiation caused by the effect of radiaton mitigation under woody plants'
+	observing
+		earth:SolarRadiation in MJ/m^2 named rg, // in MJ/m^2
+		type of im:Relevant landcover:Pastureland biology:Plant named com,
+		type of ecology.incubation:Overstory im:Relevant landcover:Pastureland biology:Plant named com2
+	set to [(com == com2) ? rg : (rg * 0.2)];
+
+
+//-----------------------------FR [0-1] -- effect of radiation on plant growth-----------------------------//
+
+@documented('grassland.radiation.vegetationlimiting')
+@intensive(space)
+model percentage of ecology:Vegetation biology:Growth caused by earth:SolarRadiation named fr
+'Percentage of radiation that limits vegetation growth. 0: No growth (maximum limiting), 1: Maximum growth (no limiting)'
+	observing
+		earth:SolarRadiation for ecology:Vegetation in MJ/m^2 named rg2,//MJ/m^2  
+		im:Maximum earth.incubation:PhotosyntheticallyActiveRadiation in MJ/m^2 named rgc_max //
+	set to [(rg2 > rgc_max) ? 1 : (rg2 / rgc_max)];
+
+
+
+////-----------------------------FTRH [0-1] -- global effect on plant growth----------------------------//
+	
+model percentage of ecology:Vegetation biology:Growth caused by ecology:VegetationLimitingFactor named ftrh
+	observing 
+		percentage of ecology:Vegetation biology:Growth caused by earth:AtmosphericTemperature named ft,
+		percentage of ecology:Vegetation biology:Growth caused by earth:SolarRadiation named fr,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh
+	set to [(ft*fr*fh) > 1 ? 1 : (ft*fr*fh) ];

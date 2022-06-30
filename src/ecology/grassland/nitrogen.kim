@@ -1,0 +1,409 @@
+namespace ecology.grassland.nitrogen
+	using (T_NPLA, T_NRESTA, T_NORGLTA, T_NORGTA, T_NMINTA, T_TNDESCD, T_TNDESCDL, T_TNORGMX, T_TNDESCH, T_TNMINMX, T_PRTVM)
+			from ecology.grassland.livestock.tables;
+
+//-------------------------------------------- tables --------------------------------------------//
+
+model proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla
+'Proportion of nitrogen in living above ground biomass'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_NPLA;
+
+@intensive(space)		
+model im:Previous chemistry:Nitrogen im:Mass of biology:Plant causing biology:Growth in g/m^2 named nresta
+'Amount of nitrogen causing vegetation growth at time = 0'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_NRESTA;
+
+@intensive(space)
+model im:Previous chemistry:Nitrogen im:Mass caused by im:Passive chemistry:Organic ecology.incubation:Decomposition in g/m^2 named norglta
+'Amount of nitrogen in passive organic decomposition at time = 0'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_NORGLTA;
+
+@intensive(space)
+model im:Previous chemistry:Nitrogen im:Mass caused by im:Active ecology.incubation:Decomposition in g/m^2 named norgta
+'Amount of nitrogen in active decomposition at time = 0'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_NORGTA;
+
+@intensive(space)
+model im:Previous chemistry:Inorganic chemistry:Nitrogen im:Mass in g/m^2 named nminta
+'Amount of inorganic nitrogen at time = 0'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_NMINTA;
+	
+number tndescd
+'Maximum proportion of litterfall nitrogen in active organic matter'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_TNDESCD;
+
+number tndescdl
+'Maximum proportion of litterfall nitrogen in passive organic matter'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_TNDESCDL;
+
+number tnorgmx
+'Maximum proportion of nitrogen from passive to active organic matter'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_TNORGMX;
+
+number tndesch
+'Maximum proportion of nitrogen from solid manure to soil'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_TNDESCH;
+
+number tnminmx
+'Maximum proportion of organic nitrogen in mineralization process'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_TNMINMX;
+
+model proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm
+'Proportion of nitrogen in resorption process'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_PRTVM;
+
+//-------------------------------------------- constants --------------------------------------------//
+
+model proportion of chemistry:Nitrogen in chemistry.incubation:Volatilization named prvolatn
+'Proportion of volatilized liquid manure'
+	set to 0.5;
+
+@intensive(space)	
+model chemistry:Nitrogen im:Mass caused by agriculture.incubation:Fertilization in g/m^2 named nestie
+'Amount of organic nitrogen added by farmer as fertilizer'
+	set to 5;
+	
+number rndesc 
+'Nitrogen mass decomposition ratio between the aerial part and the root vegetation part'
+	set to 1.5;
+
+//-------------------------------------------- models --------------------------------------------//
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass caused by ecology.incubation:Resorption in g/m^2 named nreabs
+'Amount of nitrogen in resorption process'
+	observing
+		ecology:AboveGroundBiomass caused by ecology.incubation:Senescence in g/m^2 named senes,
+		ecology:RootBiomass caused by ecology.incubation:Senescence in g/m^2 named senesr,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla
+	set to [(senes + senesr) * prtvm * npla];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart caused by ecology.incubation:Litterfall in g/m^2 named ndesf	
+'Amount of nitrogen in aerial biomass litterfall'
+	observing
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:Ingestion named ivgm2ift, 
+		proportion of ecology:AboveGroundBiomass in im:Minimum ecology.incubation:Litterfall named pimn, 
+		proportion of ecology:AboveGroundBiomass in im:Maximum ecology.incubation:Litterfall named pimx,
+		proportion of im:Minimum ecology.incubation:Litterfall in not biology.incubation:Living ecology:AboveGroundBiomass named fmn, 
+		proportion of im:Maximum ecology.incubation:Litterfall in not biology.incubation:Living ecology:AboveGroundBiomass named fmx, 
+		not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named svgm,
+		not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named smgm,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Harvesting named ksv,		
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Harvesting named ksm,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm
+	set to 	  [def pi = biov==0 ? 0 : (ivgm2ift/biov)
+			   def dt = 	(pi<pimn) ?
+								fmn
+							: ((pi>pimx) ?
+								fmx
+							:
+								fmn+(((fmx-fmn)/(pimx-pimn))*(pi-pimn))
+							)
+			  def result = (dt*biom*npla*prtvm) + ((1-ksv)*svgm*npla) + ((1-ksm)*smgm*npla*prtvm)
+			  return result]; //check > svgm2ift - smgm2ift
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass of ecology.incubation:Root caused by ecology.incubation:Litterfall in g/m^2 named ndesfr 	
+'Amount of nitrogen in root biomass litterfall'
+	observing	
+		not biology.incubation:Living ecology:RootBiomass in g/m^2 named biomr,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm
+	set dr to 0.02 
+	set to [dr * biomr * npla * prtvm];
+
+
+/*
+ * Litter
+ */
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart ecology.incubation:Litter in g/m^2 named nbiod
+'Amount of nitrogen in litterfall from aerial vegetation part'
+	observing
+		ecology.incubation:Litter ecology:AboveGroundBiomass in g/m^2 named biod,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm
+//		chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart causing im:Active ecology.incubation:Decomposition in g/m^2 named ndescd,
+//		chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart causing im:Passive ecology.incubation:Decomposition in g/m^2 named ndescdl,
+//		chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart caused by ecology.incubation:Litterfall named ndesf
+	set to 
+		[biod*npla*prtvm];
+//	over time 
+//		set to 
+//			[nbiod + ndesf - ndescd - ndescdl];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass of ecology.incubation:Root ecology.incubation:Litter in g/m^2 named nbiodr
+'Amount of nitrogen in litterfall from root vegetation part'
+	observing
+		ecology.incubation:Litter ecology:AboveGroundBiomass in g/m^2 named biod,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm
+//		chemistry:Nitrogen im:Mass of ecology.incubation:Root caused by ecology.incubation:Litterfall named ndesfr,
+//		chemistry:Nitrogen im:Mass of ecology.incubation:Root causing im:Active ecology.incubation:Decomposition in g/m^2 named ndescdr,
+//		proportion of chemistry:Nitrogen in ecology:RootBiomass causing im:Passive ecology.incubation:Decomposition named ndescdrl
+	set to 
+		[biod * npla * prtvm];
+//	over time 
+//		set to 
+//			[nbiodr + ndesfr - ndescdr - ndescdrl];		
+
+
+/*
+ * Decomposition (Active or Fast)
+ */
+
+@intensive(space)
+model ecology:AboveGroundBiomass ecology.incubation:Litter causing im:Active ecology.incubation:Decomposition in g/m^2 named descd
+'Amount of litterfall of aerial vegetation biomass in active decomposition process'
+	observing
+		proportion of earth:AtmosphericTemperature ecology:VegetationLimitingFactor causing ecology:Vegetation biology:Growth named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tndescd,
+		ecology.incubation:Litter ecology:AboveGroundBiomass in g/m^2 named biod
+	set to [ft * fh * tndescd * biod];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart caused by im:Active ecology.incubation:Decomposition in g/m^2 named ndescd    
+'Nitrogen mass in active decomposition (aerial vegetation part)'
+	observing
+		percentage of ecology:Vegetation biology:Growth caused by earth:AtmosphericTemperature named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tndescd,
+		chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart ecology.incubation:Litter in g/m^2 named nbiod
+	set to [ft * fh * tndescd * nbiod];
+
+@intensive(space) 
+model chemistry:Nitrogen im:Mass of ecology.incubation:Root caused by im:Active ecology.incubation:Decomposition in g/m^2 named ndescdr
+'Nitrogen mass in active decomposition (root vegetation part)'
+	observing
+		percentage of ecology:Vegetation biology:Growth caused by earth:AtmosphericTemperature named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tndescd,
+		chemistry:Nitrogen im:Mass of ecology.incubation:Root ecology.incubation:Litter in g/m^2 named nbiodr,
+		rndesc
+	set to [ft * fh * rndesc * tndescd * nbiodr];
+
+	
+/*
+ * Decomposition (Passive or Slowly)
+ */
+ 
+ @intensive(space)
+model ecology:AboveGroundBiomass ecology.incubation:Litter causing im:Passive ecology.incubation:Decomposition in g/m^2 named descdl
+'Amount of litterfall of aerial vegetation biomass in passive decomposition process'
+ 	observing
+		proportion of earth:AtmosphericTemperature ecology:VegetationLimitingFactor causing ecology:Vegetation biology:Growth named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tndescdl,
+		ecology.incubation:Litter ecology:AboveGroundBiomass in g/m^2 named biod
+	set to [ft * fh * tndescdl * biod];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart caused by im:Passive ecology.incubation:Decomposition in g/m^2 named ndescdl
+'Nitrogen mass in passive decomposition (aerial vegetation part)'
+	observing
+		proportion of earth:AtmosphericTemperature ecology:VegetationLimitingFactor causing ecology:Vegetation biology:Growth named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tndescdl,
+		chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart ecology.incubation:Litter in g/m^2 named nbiod 
+	set to [ft * fh * tndescdl * nbiod];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass of ecology.incubation:Root caused by im:Passive ecology.incubation:Decomposition in g/m^2 named ndescdrl 
+'Nitrogen mass in passive decomposition (root vegetation part)'
+	observing
+		proportion of earth:AtmosphericTemperature ecology:VegetationLimitingFactor causing ecology:Vegetation biology:Growth named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tndescdl,
+		chemistry:Nitrogen im:Mass of ecology.incubation:Root ecology.incubation:Litter in g/m^2 named nbiodr,
+		rndesc
+	set to [ft * fh * rndesc * tndescdl * nbiodr];
+	
+
+/*
+ * Nitrogen Cycle in Soil
+ */
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass caused by im:Passive chemistry:Organic ecology.incubation:Decomposition in g/m^2 named norgl
+'Amount of nitrogen in passive organic decomposition '
+	observing
+		im:Previous chemistry:Nitrogen im:Mass caused by im:Passive chemistry:Organic ecology.incubation:Decomposition in g/m^2 named norglta
+//		chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart causing im:Passive ecology.incubation:Decomposition in g/m^2 named ndescdl,
+//		chemistry:Nitrogen im:Mass of ecology.incubation:Root causing im:Passive ecology.incubation:Decomposition in g/m^2 named ndescdrl,
+//		chemistry.incubation:Nitrification named norgan
+	set to [norglta]; 
+//	over time
+//		set to [norgl + ndescdl + ndescdrl - norgan];
+	
+@intensive(space)
+model chemistry.incubation:Nitrification named norgan
+'Nitrification process'
+	observing
+		percentage of ecology:Vegetation biology:Growth caused by earth:AtmosphericTemperature named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tnorgmx,
+		chemistry:Nitrogen im:Mass caused by im:Passive chemistry:Organic ecology.incubation:Decomposition in g/m^2 named norgl
+	set to [ft * fh * tnorgmx * norgl];
+
+
+/*
+ * Manure...
+ */
+ 
+@intensive(space)
+model chemistry:Nitrogen im:Mass caused by im:Added physical:Solid agriculture:Manure in g/m^2 named nbioh
+'Amount of nitrogen accumulation from solid manure'
+//	observing
+//		chemistry:Nitrogen im:Mass causing agriculture:Livestock physical:Solid agriculture:Manure biology.incubation:Excretion named nhgm2ift,//[n]excretado se distribuye entre las comunidades vegetales del �rea de pastoreo del reba�o - aportaci�n por el ganado en pastoreo 
+//		chemistry:Nitrogen im:Mass caused by physical:Solid agriculture:Manure ecology.incubation:Decomposition in g/m^2 named ndesch //Descomposici�n del N de las heces a Norg�nico activo
+	set to 0
+//	over time
+//		set to [nbioh + nhgm2ift - ndesch]
+		;
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass caused by physical:Solid agriculture:Manure ecology.incubation:Decomposition in g/m^2 named ndesch 
+'The amount of nitrogen that changes from solid manure decomposition to active organic nitrogen'
+	observing
+		percentage of ecology:Vegetation biology:Growth caused by earth:AtmosphericTemperature named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tndesch, //Tasa m�xima de incorporaci�n al suelo de Norg�nico de las heces (d 1)
+		chemistry:Nitrogen im:Mass caused by im:Added physical:Solid agriculture:Manure in g/m^2 named nbioh
+	set to [ft * fh * tndesch * nbioh];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass caused by im:Added physical:Liquid agriculture:Manure in g/m^2 named nvolat
+'Amount of nitrogen accumulation from liquid manure'
+	observing
+		chemistry:Nitrogen im:Mass caused by physical:Liquid agriculture:Manure biology.incubation:Excretion in g/m^2 named nogm2ift,
+		proportion of chemistry:Nitrogen in chemistry.incubation:Volatilization named prvolatn
+	set to [nogm2ift * prvolatn];
+	
+/*
+ * ...end manure
+ */
+ 
+@intensive(space)	
+model chemistry:Nitrogen im:Mass caused by im:Active ecology.incubation:Decomposition in g/m^2 named norg
+'Amount of nitrogen in active decomposition'
+	observing
+//		chemistry:Nitrogen im:Mass causing agriculture.incubation:Fertilization in g/m^2 named nestie, 
+		im:Previous chemistry:Nitrogen im:Mass caused by im:Active ecology.incubation:Decomposition in g/m^2 named norgta//@previous norg named norgta,
+//		chemistry:Nitrogen im:Mass of ecology.incubation:AerialPlantPart causing im:Active ecology.incubation:Decomposition in g/m^2 named ndescd,
+//		chemistry:Nitrogen im:Mass of ecology.incubation:Root causing im:Active ecology.incubation:Decomposition in g/m^2 named ndescdr,
+//		chemistry.incubation:Nitrification named norgan,
+//		chemistry:Nitrogen im:Mass caused by physical:Solid agriculture:Manure ecology.incubation:Decomposition in g/m^2 named ndesch,
+//		chemistry.incubation:Mineralization named nminer
+	set to [norgta]
+//	over time
+//		set to 
+//			[(nestie is unknown) ? (norg + ndescd + ndescdr + norgan + ndesch - nminer) : 
+//								   (norg + ndescd + ndescdr + norgan + ndesch - nminer + nestie)
+//			]
+			;
+
+@intensive(space)
+model chemistry.incubation:Mineralization named nminer// in g/m^2
+'Mineralization process'
+	observing
+		percentage of ecology:Vegetation biology:Growth caused by earth:AtmosphericTemperature named ft,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		tnminmx,
+		chemistry:Nitrogen im:Mass caused by im:Active ecology.incubation:Decomposition in g/m^2 named norg
+	set to [ft * fh * tnminmx * norg];
+
+@intensive(space)
+model chemistry:Inorganic chemistry:Nitrogen im:Mass in g/m^2 named nmin
+'Amount of inorganic nitrogen'
+	observing
+		im:Previous chemistry:Inorganic chemistry:Nitrogen im:Mass in g/m^2 named nminta//@previous nmin named nminta,
+//		chemistry.incubation:Mineralization named nminer,
+//		physical:Liquid agriculture:Manure im:Mass causing agriculture:Livestock biology.incubation:Excretion named nogm2ift, //Livestock.... Nitr�geno de orina excretado
+//		proportion of chemistry:Nitrogen in chemistry.incubation:Volatilization named prvolatn, 
+//		chemistry.incubation:Leaching named nperc,
+//		ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named crec,
+//		ecology:RootBiomass caused by biology:Growth in g/m^2 named crecr,
+//		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+//		chemistry:Nitrogen im:Mass of biology:Plant causing biology:Growth in g/m^2 named nres,
+//		chemistry:Nitrogen im:Mass caused by ecology.incubation:Resorption in g/m^2 named nreabs
+	set to [nminta]
+//	over time
+//		set den to [ nres + nreabs + nmin + nminer + (nogm2ift * (1 - prvolatn)) - nperc]	
+//		set nminc to [nmin + nminer + (nogm2ift * (1 - prvolatn)) - nperc - (((nmin + nminer + (nogm2ift * (1 - prvolatn)) - nperc)/den) * (crec + crecr) * npla)]
+//		set to [(nminc < 0) ? 0 : nminc]
+		;
+
+
+@intensive(space)		
+model chemistry:Nitrogen im:Mass of chemistry.incubation:Leaching in g/m^2 named nperc
+'Amount of leaching nitrogen'
+	observing
+		chemistry:Inorganic chemistry:Nitrogen im:Mass in g/m^2 named nmin,
+		soil:TopSoil hydrology:WaterVolume in mm named dri,
+		im:Potential hydrology:AvailableWaterCapacity for ecology:Vegetation ecology.incubation:Root named adt
+	set to [def perc = (dri < 0) ? (dri * (-1)) : 0
+			def a = perc / (perc + adt)
+			def result = nmin + a
+			return result];
+
+@documented('grassland.nitrogen.uptake')
+@intensive(space)	
+model chemistry:Nitrogen im:Mass of biology:Plant causing biology:Growth in g/m^2 named nres
+'Amount of nitrogen causing vegetation growth'
+	observing
+		im:Previous chemistry:Nitrogen im:Mass of biology:Plant causing biology:Growth in g/m^2 named nresta
+//		chemistry:Nitrogen im:Mass caused by ecology.incubation:Resorption in g/m^2 named nreabs,
+//		ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named crec,
+//		ecology:RootBiomass caused by biology:Growth in g/m^2 named crecr,
+//		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+//		proportion of chemistry:Nitrogen in chemistry.incubation:Volatilization named prvolatn,
+//		chemistry:Inorganic chemistry:Nitrogen im:Mass in g/m^2 named nmin,
+//		chemistry.incubation:Mineralization named nminer,
+//		physical:Liquid agriculture:Manure im:Mass causing agriculture:Livestock biology.incubation:Excretion named nogm2ift,
+//		chemistry.incubation:Leaching named nperc
+	set to [nresta]
+//	over time
+//		set den to [nres + nreabs + nmin + nminer + (nogm2ift * (1 - prvolatn)) - nperc]
+//		set nresc to [nres + nreabs - ( ((nres + nreabs) / den) * (crec + crecr) * npla)]
+//		set to [
+//			(nresc < 0) ? 0 : nresc
+//		]
+	;
+ 
+  
+ /*
+ * Limitation Growth by Nitrogen
+ */
+@documented('grassland.nitrogen.vegetationlimiting')
+@intensive(space)
+model percentage of ecology:Vegetation biology:Growth caused by chemistry:Nitrogen named fn
+'Range of nitrogen mass that limits vegetation growth'
+	observing
+		percentage of ecology:Vegetation biology:Growth caused by ecology:VegetationLimitingFactor named ftrh,
+		occurrence of ecology.incubation:PhenologyActivity named ph,
+		ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named crec,
+		ecology:RootBiomass caused by biology:Growth in g/m^2 named crecr,
+		im:Maximum ecology:Biomass caused by biology:Growth in g/m^2 named xf,
+		proportion of ecology:RootBiomass in im:Balance ecology:Vegetation named rar
+	set to [def a = ftrh*xf*ph/(1-rar)
+			def result = (ftrh*ph)==0 ? 0 : (crec+crecr)/a
+			return result];

@@ -1,0 +1,74 @@
+{
+  "grassland.nitrogen.vegetationlimiting#Definition#Methods" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "METHODS",
+    "section" : "Methods",
+    "documentedId" : "grassland.nitrogen.vegetationlimiting",
+    "extended" : null,
+    "template" : "@section(Limiting Factor of Vegetation Growth)\r\n\r\n@section(Nitrogen Limiting Factor)\r\n\r\nThe \"Nitrogen VegetationLimitingFactor causing Vegetation Growth\" model of Nitrogen module limits the plant growth according to the nitrogen uptaked. This coefficient is in a range between 0 and 1 . Zero indicates lack of nitrogen causing the absence of growth while one indicates that the situation is optimal and consequently, the real growth is equal to the potential growth (if there is no other limitation). ",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.nitrogen.vegetationlimiting#Definition#Results" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "RESULTS",
+    "section" : "Results",
+    "documentedId" : "grassland.nitrogen.vegetationlimiting",
+    "extended" : null,
+    "template" : "@section(Nitrogen Limiting Factor)\r\n\r\n---\r\n@figure(self, Nitrogen Limiting Factor)\r\n---\r\n\r\n@link(self, Nitrogen Limiting Factor) shows the radiation growth limitation in a range between 0 and 1. 0 indicates no growth and 1 maximum growth.",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.nitrogen.uptake#Definition#Methods" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "METHODS",
+    "section" : "Methods",
+    "documentedId" : "grassland.nitrogen.uptake",
+    "extended" : null,
+    "template" : "@section(Nitrogen)\r\n@section(Nitrogen Uptake)\r\n\r\nNitrogen Uptake model simulates how much nitrogen mass takes the plant from the soil. SAVANNA model  @cite(Coughenour1994) related to Nitrogen uptake is based on the Michaelis-Menten function of organic nitrogen concentration in the soil @cite(MichaelisMenten1913) . Nitrogen uptake can vary according to the availability in the soil and how it is distributed among the species.",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.nitrogen.vegetationlimiting#Definition#Introduction" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "INTRODUCTION",
+    "section" : "Introduction",
+    "documentedId" : "grassland.nitrogen.vegetationlimiting",
+    "extended" : null,
+    "template" : "@require(im.ecology.grassland.livestock.introduction, Introduction) (@cite(Busqué2014), @cite(Villa2007), @cite(Villa2017))\r\n\r\n@require(im.ecology.grassland.livestock.vegetationlimiting, Introduction)\r\n\r\n@section(Nitrogen Limiting Factor)\r\n\r\nasdasdadad",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.nitrogen.uptake#Definition#Results" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "RESULTS",
+    "section" : "Results",
+    "documentedId" : "grassland.nitrogen.uptake",
+    "extended" : null,
+    "template" : "@section(Nitrogen)\r\n@section(Nitrogen Uptake)\r\n\r\n---\r\n@figure(self, Nitrogen Uptake)\r\n---\r\n\r\n@link(self, Nitrogen Uptake)  Uptake of inorganic soil nitrogen (g N/m2)",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.nitrogen.uptake#Definition#Introduction" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "INTRODUCTION",
+    "section" : "Introduction",
+    "documentedId" : "grassland.nitrogen.uptake",
+    "extended" : null,
+    "template" : "@require(im.ecology.grassland.livestock.introduction, Introduction) (@cite(Busqué2014), @cite(Villa2007), @cite(Villa2017))\r\n\r\n@section(Nitrogen)\r\n\r\n@section(Nitrogen Uptake)\r\n\r\nasdasdadad",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  }
+}

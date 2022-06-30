@@ -1,0 +1,74 @@
+{
+  "grassland.vegetationgrowth.rootgrowth#Definition#Introduction" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "INTRODUCTION",
+    "section" : "Introduction",
+    "documentedId" : "grassland.vegetationgrowth.rootgrowth",
+    "extended" : null,
+    "template" : "@require(im.aries.grassland.grassland.introduction, Introduction)\r\n@section(Vegetation Growth)\r\n@section(Root Biomass Growth)",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.vegetationgrowth.aerialgrowth#Definition#Methods" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "METHODS",
+    "section" : "Methods",
+    "documentedId" : "grassland.vegetationgrowth.aerialgrowth",
+    "extended" : null,
+    "template" : "@section(Vegetation Growth)\r\n@section(Above Ground Biomass Growth)\r\n",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.vegetationgrowth.aerialgrowth#Definition#Results" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "RESULTS",
+    "section" : "Results",
+    "documentedId" : "grassland.vegetationgrowth.aerialgrowth",
+    "extended" : null,
+    "template" : "@section(Vegetation Growth)\r\n@section(Above Ground Biomass Growth)\r\n---\r\n@figure(self, Above Ground Biomass Growth)\r\n---\r\n\r\n@link(self, Above Ground Biomass Growth) shows the real above ground vegetation growth in g/m^2.",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.vegetationgrowth.rootgrowth#Definition#Results" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "RESULTS",
+    "section" : "Results",
+    "documentedId" : "grassland.vegetationgrowth.rootgrowth",
+    "extended" : null,
+    "template" : "@section(Vegetation Growth)\r\n@section(Root Growth)\r\n---\r\n@figure(self, Root Growth)\r\n---\r\n\r\n@link(self,Root Growth) shows the real root vegetation growth in g/m^2.",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.vegetationgrowth.rootgrowth#Definition#Methods" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "METHODS",
+    "section" : "Methods",
+    "documentedId" : "grassland.vegetationgrowth.rootgrowth",
+    "extended" : null,
+    "template" : "@section(Vegetation Growth)\r\n@section(Root Biomass Growth)\r\n\r\nbbbbbbbbbbbb",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.vegetationgrowth.aerialgrowth#Definition#Introduction" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "INTRODUCTION",
+    "section" : "Introduction",
+    "documentedId" : "grassland.vegetationgrowth.aerialgrowth",
+    "extended" : null,
+    "template" : "@require(im.aries.grassland.grassland.introduction, Introduction)\r\n@section(Vegetation Growth)\r\n@section(Above Ground Biomass Growth)",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  }
+}

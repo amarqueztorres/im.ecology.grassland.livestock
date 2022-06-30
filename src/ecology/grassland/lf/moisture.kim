@@ -1,0 +1,224 @@
+namespace ecology.grassland.lf.moisture
+	using (T_EPR_ZERO, T_EPR_ONE, T_EBIOM, T_EK_ZERO, T_EK_ONE, T_PROFUND, T_P) //T_TC_MIN, T_TC_MAX, T_TC_OPT, T_RC_MAX,
+			from ecology.grassland.livestock.tables;
+
+
+//-------------------------------------------- tables --------------------------------------------//
+
+number epr0 
+"Proportion of the biov (living biomass) reference below which Kc (Crop Coefficient) is minimum and constant (ek0)"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_EPR_ZERO;
+
+number epr1 
+"Proportion of the biov (living biomass) reference at which kc (Crop Coefficient) = kcmax (Maximum Crop coefficient)"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_EPR_ONE;
+	
+number ebiom 
+"Biomass when Kc (crop coefficient) is 1"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com 
+	lookup (com) into T_EBIOM;
+
+number ek0 
+"Minimum and constant Crop Coefficient"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_EK_ZERO;
+
+number ek1 
+"Definition of the function slope between Kc (Crop coefficient) and biov (living biomass) "
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_EK_ONE;
+
+@intensive(space)
+model im:Maximum im:Length of ecology.incubation:Root in mm named profr  
+"Root depth when there are no limitations"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_PROFUND;
+	
+model im:Potential hydrology:AvailableWaterCapacity named p 
+"Average fraction of total available soil watervolume that can be
+depleted from the root zone before moisture stress (reduction in ET) occurs"
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_P;
+	
+
+//-------------------------------------------- models --------------------------------------------//
+
+/*
+ * b) Moisture drivers
+*/
+
+number kc_a
+	observing
+		ek0,
+		ek1,
+		epr0,
+		epr1
+	set to [(-1*(ek1*epr0)+(ek0*epr1))/(epr1-epr0)];
+	
+number kc_b
+	observing
+		ek0,
+		ek1,
+		epr0,
+		epr1,
+		ebiom
+	set to [(ek1-ek0)/((epr1-epr0)*ebiom)];
+
+model im:Maximum hydrology.incubation:CropCoefficient named kc_max set to 1.3;
+
+@intensive(space)
+model hydrology.incubation:CropCoefficient named kc
+"Properties of plants used in predicting evapotranspiration (ET)"
+	observing
+		kc_a,
+		kc_b,
+		kc_max,
+		ek0,
+		ek1,
+		epr0,	
+		epr1,
+		ebiom,
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov
+		set to [ if (biov < (epr0*ebiom)) {
+					ek0
+				}else if ((kc_a + kc_b * biov) > kc_max) {
+					kc_max
+				}else { 
+					(kc_a + kc_b * biov)
+				} ];
+
+@intensive(space)
+model im:Volume of ecology:Evapotranspiration in mm named et0
+"Reference evapotranspiration "
+	observing
+		earth:AtmosphericTemperature for ecology:Vegetation in Celsius named tmed2,
+		earth:SolarRadiation for ecology:Vegetation in MJ/m^2 named rg2
+	set to [0.0135 * (tmed2 + 17.8) * (rg2 / 2.45)];
+
+
+
+@intensive(space)
+model im:Length of ecology:Vegetation ecology.incubation:Root in mm named profrc
+"Root depth considering limitations"
+	observing
+//		soil.incubation:SoilDepth in cm named prof,
+		im:Maximum im:Length of ecology.incubation:Root in mm named profr 
+//	set to [prof > profr ? profr : prof];	
+set to [profr];
+	
+@intensive(space)
+model im:Potential hydrology:WaterVolume in mm named prpr
+"Proportion of soil watervolume content available to roots"
+	observing
+		im:Length of ecology:Vegetation ecology.incubation:Root in mm named profrc,
+		hydrology:AvailableWaterCapacity named p
+	set to [(profrc * p)];
+
+@extensive(space)
+model hydrology.incubation:FieldCapacity named fc
+"The moisture equivalent as a measure of the field capacity of soils"
+ 	observing 
+ 		type of soil:SoilTexture named soil_red
+ 	set to [
+		(soil_red == soil:Sand) ? 0.24 : ( 
+		(soil_red == soil:Loam) ? 0.35 : 0.44 )];
+
+@extensive(space)
+model soil.incubation:PermanentWiltingPoint in m^3 named pwp
+"Permanent wilting point (PWP) is defined as the minimal amount of watervolume in the soil that the plant requires not to wilt."
+	observing 
+		type of soil:SoilTexture named soil_red
+ 		set to [
+			(soil_red == soil:Sand) ? 0.09 : ( 
+			(soil_red == soil:Loam) ? 0.16 : 0.26 )];
+
+@extensive(space) 
+model im:Potential hydrology:AvailableWaterCapacity for ecology.incubation:Root named adt
+"Potential available soil watervolume in the root zone"
+	observing
+		hydrology.incubation:FieldCapacity named fc,
+		soil.incubation:PermanentWiltingPoint in m^3 named pwp, 
+		im:Length of ecology:Vegetation ecology.incubation:Root in mm named profrc
+	set to [(fc-pwp)*profrc];
+
+@intensive(space)	
+model hydrology:PotentialEvapotranspiredWaterVolume in mm named etc
+"Representation of the environmental demand for evapotranspiration and represents the evapotranspiration 
+rate of a short green crop (grass), completely shading the ground, of uniform height and with adequate watervolume 
+status in the soil profile"
+	observing
+		im:Volume of ecology:Evapotranspiration in mm named et0,
+		hydrology.incubation:CropCoefficient named kc
+	set to [et0*kc];
+
+model hydrology:AvailableWaterCapacity for ecology.incubation:Root named afa
+"The readily available soil watervolume in the root zone"
+	observing
+		im:Potential hydrology:AvailableWaterCapacity for ecology.incubation:Root named adt,
+		im:Potential hydrology:AvailableWaterCapacity named p
+	set to [(adt*p)];
+//over time
+//		set to [adt*pc2]; //by id_mancha, com y prec
+
+@intensive(space)
+number drf 
+"Initial depletion"
+	set to [0];
+//	over time
+//		set to [def et = fh * etc
+//				def drfv = et - prec + drf
+//				def drf =   (drfv < 0) ? 0 : (
+//							(drfv > adt) ? adt :
+//							drfv)
+//				return drf];	
+	
+@intensive(space)
+model soil:TopSoil hydrology:WaterVolume in mm named dri 
+"Volume of watervolume in the root zone caused by the limits on root zone depletion by evapotranspiration"
+	observing
+		hydrology:PotentialEvapotranspiredWaterVolume in mm named etc, 
+		earth:PrecipitationVolume in mm named prec,
+		im:Potential hydrology:AvailableWaterCapacity for ecology.incubation:Root named adt
+	set to [def predri = etc - prec
+			def result = (predri< 0) ? 0 : (
+				(predri > adt) ? adt : 
+				predri)
+			return result
+			];
+//	over time //(time = "1 day")
+//		set to [def et = fh * etc
+//				def drfp = et - prec + drf
+//				def result = (drfp < 0) ? 0 : (
+//							 (drfp > adt) ? adt :
+//							  drfp)
+//				return result];	
+
+
+////-----------------------------FH [0-1] -- effect of moisture on plant growth----------------------------//
+
+@documented('grassland.moisture.vegetationlimiting')
+@intensive(space)
+model percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh
+"Coefficient that calculates vegetation watervolume stress through soil moisture and vegetation characteristics. Range from 0 (maximum limitation) to 1 (no limitation)"
+	observing
+		im:Potential hydrology:AvailableWaterCapacity for ecology.incubation:Root named adt,
+		soil:TopSoil hydrology:WaterVolume in mm named dri,
+		afa
+	set to [((adt-dri)/(adt-afa)) > 1 ? 1 : ((adt-dri)/(adt-afa))];
+
+
+@intensive(space)
+model im:Potential hydrology:AvailableWaterCapacity caused by hydrology.incubation:Moisture named pc2
+"Adjustment of Potential AvailableWaterCapacity for different PotentialEvapotranspiredWaterVolume and Soil Moisture"
+	observing
+		type of soil:SoilTexture named soil_red,
+		im:Potential hydrology:AvailableWaterCapacity named p,
+		hydrology:PotentialEvapotranspiredWaterVolume in mm named etc,
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh
+	set to [def pc = (p + 0.04 * (5-(fh*etc)))
+			def result = (soil_red is soil:Loam) ? pc : ( 
+				  (soil_red is soil:Sand) ? pc - 0.075 * pc :
+				  (pc + 0.075 * pc))
+			return result];

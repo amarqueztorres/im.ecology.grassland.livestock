@@ -1,0 +1,772 @@
+namespace ecology.grassland.livestock.tables;
+
+
+/*
+ * MOISTURE
+ */
+
+define T_EPR_ZERO as {{	
+	com									|		epr_zero	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|0.2,
+	biology.nomenclature:FestucaRubra	|0.2,
+	biology.nomenclature:Helictotrichon |0.2,
+	biology.nomenclature:Phragmites     |0.2,
+	biology.nomenclature:Polypodiopsida |0.2,
+	biology.nomenclature:Senecio  		|0.2,
+	biology.nomenclature:UlexGallii		|0.2,
+	biology.nomenclature:Carex    		|0.2,
+	biology.nomenclature:Gramineae      |0.2,
+	biology.nomenclature:UlexEuropaeus  |0.2			
+}};
+
+define T_EPR_ONE as {{	
+	com									|		epr_one	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|0.5,
+	biology.nomenclature:FestucaRubra	|0.5,
+	biology.nomenclature:Helictotrichon |0.5,
+	biology.nomenclature:Phragmites     |0.5,
+	biology.nomenclature:Polypodiopsida |0.5,
+	biology.nomenclature:Senecio  		|0.5,
+	biology.nomenclature:UlexGallii		|0.5,
+	biology.nomenclature:Carex    		|0,
+	biology.nomenclature:Gramineae      |0.5,
+	biology.nomenclature:UlexEuropaeus  |0.5		
+}};
+
+define T_EBIOM as {{	
+	com									|		ebiom	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna        |300,
+	biology.nomenclature:FestucaRubra   |250,
+	biology.nomenclature:Helictotrichon |250,
+	biology.nomenclature:Phragmites     |250,
+	biology.nomenclature:Polypodiopsida |300,
+	biology.nomenclature:Senecio   		|250,
+	biology.nomenclature:UlexGallii     |250,
+	biology.nomenclature:Carex   		|250,
+	biology.nomenclature:Gramineae      |250,
+	biology.nomenclature:UlexEuropaeus  |250
+}};
+
+define T_EK_ZERO as {{	
+	com									|		ek_zero	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|0.4,
+	biology.nomenclature:FestucaRubra	|0.4,
+	biology.nomenclature:Helictotrichon |0.4,
+	biology.nomenclature:Phragmites     |0.4,
+	biology.nomenclature:Polypodiopsida |0.4,
+	biology.nomenclature:Senecio  		|0.4,
+	biology.nomenclature:UlexGallii		|0.4,
+	biology.nomenclature:Carex    		|0.4,
+	biology.nomenclature:Gramineae      |0.4,
+	biology.nomenclature:UlexEuropaeus  |0.4			
+}};
+
+define T_EK_ONE as {{	
+	com									|		ek_one	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|0.5,
+	biology.nomenclature:FestucaRubra	|0.5,
+	biology.nomenclature:Helictotrichon |0.5,
+	biology.nomenclature:Phragmites     |0.5,
+	biology.nomenclature:Polypodiopsida |0.5,
+	biology.nomenclature:Senecio  		|0.5,
+	biology.nomenclature:UlexGallii		|0.5,
+	biology.nomenclature:Carex    		|0.5,
+	biology.nomenclature:Gramineae      |0.5,
+	biology.nomenclature:UlexEuropaeus  |0.5			
+}};
+
+define T_PROFUND as {{
+	com									|		profr	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|600,
+	biology.nomenclature:FestucaRubra	|300,
+	biology.nomenclature:Helictotrichon |500,
+	biology.nomenclature:Phragmites     |300,
+	biology.nomenclature:Polypodiopsida |500,
+	biology.nomenclature:Senecio  		|300,
+	biology.nomenclature:UlexGallii     |600,
+	biology.nomenclature:Carex    		|400,
+	biology.nomenclature:Gramineae      |300,
+	biology.nomenclature:UlexEuropaeus  |1000	
+}};
+
+define T_P as {{
+	com									|		p	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|0.5,
+	biology.nomenclature:FestucaRubra	|0.5,
+	biology.nomenclature:Helictotrichon |0.5,
+	biology.nomenclature:Phragmites     |0.5,
+	biology.nomenclature:Polypodiopsida |0.5,
+	biology.nomenclature:Senecio  		|0.5,
+	biology.nomenclature:UlexGallii		|0.5,
+	biology.nomenclature:Carex    		|0.5,
+	biology.nomenclature:Gramineae      |0.5,
+	biology.nomenclature:UlexEuropaeus  |0.5			
+}};
+
+
+/*
+ * RADIATION
+ */
+ 
+define T_RC_MAX as {{	
+	com									|		rc_max	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|25,
+	biology.nomenclature:FestucaRubra	|25,
+	biology.nomenclature:Helictotrichon |25,
+	biology.nomenclature:Phragmites     |25,
+	biology.nomenclature:Polypodiopsida |25,
+	biology.nomenclature:Senecio  		|25,
+	biology.nomenclature:UlexGallii		|25,
+	biology.nomenclature:Carex    		|25,
+	biology.nomenclature:Gramineae      |25,
+	biology.nomenclature:UlexEuropaeus  |25		
+}};
+
+
+/*
+ * TEMPERATURA
+ */
+
+define T_TC_MIN as {{	
+	com									|		tc_min	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna        |4,
+	biology.nomenclature:FestucaRubra	|6,
+	biology.nomenclature:Helictotrichon |6,
+	biology.nomenclature:Phragmites     |6,
+	biology.nomenclature:Polypodiopsida |9,
+	biology.nomenclature:Senecio  		|6,
+	biology.nomenclature:UlexGallii     |6,
+	biology.nomenclature:Carex    		|5,
+	biology.nomenclature:Gramineae      |6,
+	biology.nomenclature:UlexEuropaeus  |9
+}};
+
+define T_TC_MAX as {{	
+	com									|		tc_max	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|35,
+	biology.nomenclature:FestucaRubra	|35,
+	biology.nomenclature:Helictotrichon |35,
+	biology.nomenclature:Phragmites     |35,
+	biology.nomenclature:Polypodiopsida |35,
+	biology.nomenclature:Senecio  		|35,
+	biology.nomenclature:UlexGallii		|35,
+	biology.nomenclature:Carex    		|35,
+	biology.nomenclature:Gramineae      |35,
+	biology.nomenclature:UlexEuropaeus  |35		
+}};
+
+define T_TC_OPT as {{	
+	com									|		tc_opt	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|21,
+	biology.nomenclature:FestucaRubra	|21,
+	biology.nomenclature:Helictotrichon |21,
+	biology.nomenclature:Phragmites     |21,
+	biology.nomenclature:Polypodiopsida |21,
+	biology.nomenclature:Senecio  		|21,
+	biology.nomenclature:UlexGallii		|21,
+	biology.nomenclature:Carex    		|21,
+	biology.nomenclature:Gramineae      |21,
+	biology.nomenclature:UlexEuropaeus  |21		
+}};
+
+define T_IDHL as {{	
+	com									|		idhl	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna        |ecology.incubation:Understory,
+	biology.nomenclature:FestucaRubra	|ecology.incubation:GroundCover,
+	biology.nomenclature:Helictotrichon |ecology.incubation:GroundCover,
+	biology.nomenclature:Phragmites     |ecology.incubation:GroundCover,
+	biology.nomenclature:Polypodiopsida |ecology.incubation:Midstory,
+	biology.nomenclature:Senecio   		|ecology.incubation:GroundCover,
+	biology.nomenclature:UlexGallii     |ecology.incubation:Understory,
+	biology.nomenclature:Carex    		|ecology.incubation:GroundCover,
+	biology.nomenclature:Gramineae      |ecology.incubation:GroundCover,
+	biology.nomenclature:UlexEuropaeus  |ecology.incubation:Midstory	
+}};
+
+//1: herb�cea; 2: arbustiva baja; 3: arbustiva alta; 4: arb�rea)
+
+/*
+ * LITTERFALL
+ */
+
+define T_BIOD as {{	
+	com									|		remd_biodta	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	80,
+	biology.nomenclature:FestucaRubra	|	20,
+	biology.nomenclature:Helictotrichon |	40,
+	biology.nomenclature:Phragmites     |	10,
+	biology.nomenclature:Polypodiopsida |	80,
+	biology.nomenclature:Senecio   		|	20,
+	biology.nomenclature:UlexGallii     |	50,
+	biology.nomenclature:Carex    		|	10,
+	biology.nomenclature:Gramineae      |	20,
+	biology.nomenclature:UlexEuropaeus  |	100	
+}};
+
+define T_BIOM as {{	
+	com									|		remm_biomta	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	40,
+	biology.nomenclature:FestucaRubra	|	20,
+	biology.nomenclature:Helictotrichon |	110,
+	biology.nomenclature:Phragmites     |	10,
+	biology.nomenclature:Polypodiopsida |	200,
+	biology.nomenclature:Senecio   		|	40,
+	biology.nomenclature:UlexGallii     |	100,
+	biology.nomenclature:Carex    		|	10,
+	biology.nomenclature:Gramineae      |	20,
+	biology.nomenclature:UlexEuropaeus  |	200	
+}};
+ 
+define T_BIOMR as {{	
+	com									|		remm_biomrta	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	40,
+	biology.nomenclature:FestucaRubra	|	20,
+	biology.nomenclature:Helictotrichon |	110,
+	biology.nomenclature:Phragmites     |	10,
+	biology.nomenclature:Polypodiopsida |	200,
+	biology.nomenclature:Senecio   		|	40,
+	biology.nomenclature:UlexGallii     |	100,
+	biology.nomenclature:Carex    		|	10,
+	biology.nomenclature:Gramineae      |	20,
+	biology.nomenclature:UlexEuropaeus  |	200	
+}}; 
+ 
+define T_FMX as {{	
+	com									|		fmx	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	0.01,
+	biology.nomenclature:FestucaRubra	|	0.02,
+	biology.nomenclature:Helictotrichon |	0.02,
+	biology.nomenclature:Phragmites     |	0.02,
+	biology.nomenclature:Polypodiopsida |	0.02,
+	biology.nomenclature:Senecio   		|	0.02,
+	biology.nomenclature:UlexGallii     |	0.01,
+	biology.nomenclature:Carex    		|	0.02,
+	biology.nomenclature:Gramineae      |	0.02,
+	biology.nomenclature:UlexEuropaeus  |	0.01	
+}};
+ 
+define T_FMN as {{	
+	com									|		fmn
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	0.002,
+	biology.nomenclature:FestucaRubra	|	0.002,
+	biology.nomenclature:Helictotrichon |	0.002,
+	biology.nomenclature:Phragmites     |	0.002,
+	biology.nomenclature:Polypodiopsida |	0.002,
+	biology.nomenclature:Senecio   		|	0.002,
+	biology.nomenclature:UlexGallii     |	0.002,
+	biology.nomenclature:Carex    		|	0.002,
+	biology.nomenclature:Gramineae      |	0.002,
+	biology.nomenclature:UlexEuropaeus  |	0.002	
+}}; 
+ 
+
+/*
+ * EXCRETION
+ */
+
+define T_PROBH as {{	
+	com										|	probh
+	-------------------------------------------------------
+	biology.nomenclature:Calluna        	|	0.3,
+	biology.nomenclature:FestucaRubra		|	0.8,
+	biology.nomenclature:Helictotrichon 	|	0.2,
+	biology.nomenclature:Phragmites     	|	0.6,
+	biology.nomenclature:Polypodiopsida 	|	0.4,
+	biology.nomenclature:Senecio   			|	0.8,
+	biology.nomenclature:UlexGallii     	|	0.3,
+	biology.nomenclature:Carex    			|	0.5,
+	biology.nomenclature:Gramineae      	|	0.8,
+	biology.nomenclature:UlexEuropaeus  	|	0.3	
+}};
+
+
+/*
+ * INGESTION
+ */
+
+define T_FANTIN_C as {{
+	com2									|	fantin
+	------------------------------------------------------
+	biology.nomenclature:Calluna        	|	0.2,
+	biology.nomenclature:FestucaRubra		|	1,
+	biology.nomenclature:Helictotrichon 	|	1,
+	biology.nomenclature:Phragmites     	|	1,
+	biology.nomenclature:Polypodiopsida 	|	0.3,
+	biology.nomenclature:Senecio   			|	0.01,
+	biology.nomenclature:UlexGallii     	|	0,
+	biology.nomenclature:Carex    			|	0.05,
+	biology.nomenclature:Gramineae      	|	0.05,
+	biology.nomenclature:UlexEuropaeus  	|	1	
+}};
+
+define T_FANTIN_M as {{
+	com2									|	fantin
+	----------------------------------------------------
+	biology.nomenclature:Calluna        	|	0,
+	biology.nomenclature:FestucaRubra		|	1,
+	biology.nomenclature:Helictotrichon 	|	1,
+	biology.nomenclature:Phragmites     	|	1,
+	biology.nomenclature:Polypodiopsida 	|	1,
+	biology.nomenclature:Senecio   			|	0.01,
+	biology.nomenclature:UlexGallii     	|	0,
+	biology.nomenclature:Carex    			|	0.2,
+	biology.nomenclature:Gramineae      	|	0.1,
+	biology.nomenclature:UlexEuropaeus  	|	1	
+}};
+
+define T_MAT_C as {{
+	com2									|	mat
+	---------------------------------------------------------------------------------------------------
+	biology.nomenclature:Calluna        	|	0,
+	biology.nomenclature:FestucaRubra		|	0,
+	biology.nomenclature:Helictotrichon 	|	0,
+	biology.nomenclature:Phragmites     	|	0.9,
+	biology.nomenclature:Polypodiopsida 	|	0,
+	biology.nomenclature:Senecio   			|	0,
+	biology.nomenclature:UlexGallii     	|	0,
+	biology.nomenclature:Carex    			|	1,
+	biology.nomenclature:Gramineae      					|	1,
+	biology.nomenclature:UlexEuropaeus  	|	0	
+}};
+
+define T_MAT_M as {{
+	com2									|	mat
+	---------------------------------------------------------------------------------------------------
+	biology.nomenclature:Calluna        	|	0,
+	biology.nomenclature:FestucaRubra		|	0,
+	biology.nomenclature:Helictotrichon 	|	0,
+	biology.nomenclature:Phragmites     	|	0.9,
+	biology.nomenclature:Polypodiopsida 	|	0,
+	biology.nomenclature:Senecio   			|	0,
+	biology.nomenclature:UlexGallii     	|	0,
+	biology.nomenclature:Carex    			|	1,
+	biology.nomenclature:Gramineae      					|	1,
+	biology.nomenclature:UlexEuropaeus  	|	0	
+}};
+
+
+/*
+ * LIVESTOCK MASS
+ */
+ 
+define T_DIGV_C as {{
+	com2								|	digv
+	----------------------------------------------------
+	biology.nomenclature:Calluna        	|	0.5,
+	biology.nomenclature:FestucaRubra		|	0.7,
+	biology.nomenclature:Helictotrichon 	|	0.45,
+	biology.nomenclature:Phragmites     	|	0.5,
+	biology.nomenclature:Polypodiopsida 	|	0.55,
+	biology.nomenclature:Senecio   			|	1,
+	biology.nomenclature:UlexGallii     	|	0.4,
+	biology.nomenclature:Carex    			|	0.7,
+	biology.nomenclature:Gramineae      					|	0.7,
+	biology.nomenclature:UlexEuropaeus  	|	0.4	
+}};
+
+define T_DIGV_M as {{
+	com2									|	digv
+	----------------------------------------------------
+	biology.nomenclature:Calluna        	|	0.45,
+	biology.nomenclature:FestucaRubra		|	0.65,
+	biology.nomenclature:Helictotrichon 	|	0.4,
+	biology.nomenclature:Phragmites     	|	0.45,
+	biology.nomenclature:Polypodiopsida 	|	0.5,
+	biology.nomenclature:Senecio   			|	1,
+	biology.nomenclature:UlexGallii     	|	0.35,
+	biology.nomenclature:Carex    			|	0.65,
+	biology.nomenclature:Gramineae      					|	0.65,
+	biology.nomenclature:UlexEuropaeus  	|	0.35
+}};
+
+define T_DIGM_C as {{
+	com2									|	digm
+	------------------------------------------------------
+	biology.nomenclature:Calluna        	|	0.15,
+	biology.nomenclature:FestucaRubra		|	0.15,
+	biology.nomenclature:Helictotrichon 	|	0.15,
+	biology.nomenclature:Phragmites     	|	0.15,
+	biology.nomenclature:Polypodiopsida 	|	0.15,
+	biology.nomenclature:Senecio   			|	0.15,
+	biology.nomenclature:UlexGallii     	|	0.15,
+	biology.nomenclature:Carex    			|	0.15,
+	biology.nomenclature:Gramineae      					|	0.15,
+	biology.nomenclature:UlexEuropaeus  	|	0.15	
+}};
+
+define T_DIGM_M as {{
+	com2									|	digm
+	-----------------------------------------------------
+	biology.nomenclature:Calluna        	|	0.15,
+	biology.nomenclature:FestucaRubra		|	0.15,
+	biology.nomenclature:Helictotrichon 	|	0.15,
+	biology.nomenclature:Phragmites     	|	0.15,
+	biology.nomenclature:Polypodiopsida 	|	0.15,
+	biology.nomenclature:Senecio   			|	0.15,
+	biology.nomenclature:UlexGallii     	|	0.15,
+	biology.nomenclature:Carex    			|	0.15,
+	biology.nomenclature:Gramineae      					|	0.15,
+	biology.nomenclature:UlexEuropaeus  	|	0.15	
+}}; 
+
+
+/*
+ * NITROGEN
+ */
+
+define T_NPLA as {{	
+	com									|		n_pla	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	0.01,
+	biology.nomenclature:FestucaRubra	|	0.02,
+	biology.nomenclature:Helictotrichon |	0.01,
+	biology.nomenclature:Phragmites     |	0.01,
+	biology.nomenclature:Polypodiopsida |	0.01,
+	biology.nomenclature:Senecio   		|	0.02,
+	biology.nomenclature:UlexGallii     |	0.02,
+	biology.nomenclature:Carex    		|	0.02,
+	biology.nomenclature:Gramineae      |	0.02,
+	biology.nomenclature:UlexEuropaeus  |	0.02	
+}};
+
+define T_NRESTA as {{	
+com									|		nresta
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|	0.5,
+	biology.nomenclature:FestucaRubra	|	0.5,
+	biology.nomenclature:Helictotrichon	|	0.5,
+	biology.nomenclature:Phragmites		|	0.5,
+	biology.nomenclature:Polypodiopsida	|	0.5,
+	biology.nomenclature:Senecio  	 	|	0.5,
+	biology.nomenclature:UlexGallii     |	0.5,
+	biology.nomenclature:Carex    		|	0.5,
+	biology.nomenclature:Gramineae      |	0.5,
+	biology.nomenclature:UlexEuropaeus  |	0.5	
+}};
+
+define T_NORGLTA as {{	
+	com									|		norglta
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|	500,
+	biology.nomenclature:FestucaRubra	|	500,
+	biology.nomenclature:Helictotrichon	|	500,
+	biology.nomenclature:Phragmites		|	500,
+	biology.nomenclature:Polypodiopsida	|	500,
+	biology.nomenclature:Senecio  	 	|	500,
+	biology.nomenclature:UlexGallii     |	500,
+	biology.nomenclature:Carex    		|	500,
+	biology.nomenclature:Gramineae      |	500,
+	biology.nomenclature:UlexEuropaeus  |	500	
+}};
+
+define T_NORGTA as {{	
+	com									|		norgta
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|	1,
+	biology.nomenclature:FestucaRubra	|	1,
+	biology.nomenclature:Helictotrichon	|	1,
+	biology.nomenclature:Phragmites		|	1,
+	biology.nomenclature:Polypodiopsida	|	1,
+	biology.nomenclature:Senecio  	 	|	1,
+	biology.nomenclature:UlexGallii     |	1,
+	biology.nomenclature:Carex    		|	1,
+	biology.nomenclature:Gramineae      |	1,
+	biology.nomenclature:UlexEuropaeus  |	1	
+}};
+
+define T_NMINTA as {{	
+	com									|		nminta
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|	0.5,
+	biology.nomenclature:FestucaRubra	|	0.5,
+	biology.nomenclature:Helictotrichon	|	0.5,
+	biology.nomenclature:Phragmites		|	0.5,
+	biology.nomenclature:Polypodiopsida	|	0.5,
+	biology.nomenclature:Senecio  	 	|	0.5,
+	biology.nomenclature:UlexGallii     |	0.35,
+	biology.nomenclature:Carex    		|	0.5,
+	biology.nomenclature:Gramineae      |	0.5,
+	biology.nomenclature:UlexEuropaeus  |	0.5	
+}};
+
+define T_TNDESCD as {{	
+	com									|		tndescd
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|	0.001,
+	biology.nomenclature:FestucaRubra	|	0.020,
+	biology.nomenclature:Helictotrichon	|	0.005,
+	biology.nomenclature:Phragmites		|	0.005,
+	biology.nomenclature:Polypodiopsida	|	0.005,
+	biology.nomenclature:Senecio  	 	|	0.010,
+	biology.nomenclature:UlexGallii     |	0.005,
+	biology.nomenclature:Carex    		|	0.010,
+	biology.nomenclature:Gramineae      |	0.020,
+	biology.nomenclature:UlexEuropaeus  |	0.005	
+}};
+
+define T_TNDESCDL as {{	
+	com									|		tndescdl
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|	0.007,
+	biology.nomenclature:FestucaRubra	|	0.001,
+	biology.nomenclature:Helictotrichon	|	0.004,
+	biology.nomenclature:Phragmites		|	0.004,
+	biology.nomenclature:Polypodiopsida	|	0.004,
+	biology.nomenclature:Senecio		|	0.003,
+	biology.nomenclature:UlexGallii     |	0.004,
+	biology.nomenclature:Carex    		|	0.003,
+	biology.nomenclature:Gramineae      |	0.001,
+	biology.nomenclature:UlexEuropaeus  |	0.004	
+}};
+	
+define T_TNORGMX as {{	
+	com									|		tnorgmx
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|	0.000025,
+	biology.nomenclature:FestucaRubra	|	0.000050,
+	biology.nomenclature:Helictotrichon	|	0.000050,
+	biology.nomenclature:Phragmites		|	0.000025,
+	biology.nomenclature:Polypodiopsida	|	0.000025,
+	biology.nomenclature:Senecio   		|	0.000050,
+	biology.nomenclature:UlexGallii     |	0.000050,
+	biology.nomenclature:Carex    		|	0.000050,
+	biology.nomenclature:Gramineae      |	0.000050,
+	biology.nomenclature:UlexEuropaeus  |	0.000050	
+}};
+
+define T_TNDESCH as {{	
+	com									|		tndesch
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|	0.5,
+	biology.nomenclature:FestucaRubra	|	0.5,
+	biology.nomenclature:Helictotrichon	|	0.5,
+	biology.nomenclature:Phragmites		|	0.5,
+	biology.nomenclature:Polypodiopsida	|	0.5,
+	biology.nomenclature:Senecio  	 	|	0.5,
+	biology.nomenclature:UlexGallii     |	0.5,
+	biology.nomenclature:Carex    		|	0.5,
+	biology.nomenclature:Gramineae      |	0.5,
+	biology.nomenclature:UlexEuropaeus  |	0.5	
+}};
+
+define T_TNMINMX as {{	
+	com									|		tnminmx
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna			|	0.01,
+	biology.nomenclature:FestucaRubra		|	0.02,
+	biology.nomenclature:Helictotrichon		|	0.01,
+	biology.nomenclature:Phragmites			|	0.01,
+	biology.nomenclature:Polypodiopsida		|	0.01,
+	biology.nomenclature:Senecio  	 		|	0.01,
+	biology.nomenclature:UlexGallii     	|	0.01,
+	biology.nomenclature:Carex    			|	0.01,
+	biology.nomenclature:Gramineae      					|	0.02,
+	biology.nomenclature:UlexEuropaeus  	|	0.01	
+}};
+
+define T_PRTVM as {{
+	com										|		prtvm
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna			|	0.6,
+	biology.nomenclature:FestucaRubra		|	0.5,
+	biology.nomenclature:Helictotrichon		|	0.5,
+	biology.nomenclature:Phragmites			|	0.5,
+	biology.nomenclature:Polypodiopsida		|	0.6,
+	biology.nomenclature:Senecio  	 		|	0.5,
+	biology.nomenclature:UlexGallii     	|	0.5,
+	biology.nomenclature:Carex    			|	0.5,
+	biology.nomenclature:Gramineae      					|	0.5,
+	biology.nomenclature:UlexEuropaeus  	|	0.5	
+}};
+
+
+/*
+ * SENESCENCE
+ */
+
+define T_FHS as {{	
+	com									|		fhs	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna        |0.3,
+	biology.nomenclature:FestucaRubra   |0.4,
+	biology.nomenclature:Helictotrichon |0.3,
+	biology.nomenclature:Phragmites     |0.4,
+	biology.nomenclature:Polypodiopsida |0.3,
+	biology.nomenclature:Senecio   		|0.3,
+	biology.nomenclature:UlexGallii     |0.4,
+	biology.nomenclature:Carex    		|0.3,
+	biology.nomenclature:Gramineae      |0.4,
+	biology.nomenclature:UlexEuropaeus  |0.4	
+}};
+
+define T_SH_ZERO as {{	
+	com									|		sh_zero	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	0.005,
+	biology.nomenclature:FestucaRubra	|	0.030,
+	biology.nomenclature:Helictotrichon |	0.010,
+	biology.nomenclature:Phragmites     |	0.007,
+	biology.nomenclature:Polypodiopsida |	0.010,
+	biology.nomenclature:Senecio   		|	0.010,
+	biology.nomenclature:UlexGallii     |	0.010,
+	biology.nomenclature:Carex    		|	0.003,
+	biology.nomenclature:Gramineae      |	0.030,
+	biology.nomenclature:UlexEuropaeus  |	0.010	
+}};
+
+define T_SH_ONE as {{	
+	com									|		sh_one
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	0.002,
+	biology.nomenclature:FestucaRubra	|	0.005,
+	biology.nomenclature:Helictotrichon |	0.005,
+	biology.nomenclature:Phragmites     |	0.002,
+	biology.nomenclature:Polypodiopsida |	0.005,
+	biology.nomenclature:Senecio   		|	0.005,
+	biology.nomenclature:UlexGallii     |	0.002,
+	biology.nomenclature:Carex    		|	0.001,
+	biology.nomenclature:Gramineae      |	0.008,
+	biology.nomenclature:UlexEuropaeus  |	0.002	
+}};
+
+define T_T_ZERO as {{	
+	com									|		t_zero	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	-5,
+	biology.nomenclature:FestucaRubra	|	-1,
+	biology.nomenclature:Helictotrichon |	-1,
+	biology.nomenclature:Phragmites     |	-1,
+	biology.nomenclature:Polypodiopsida |	5,
+	biology.nomenclature:Senecio   		|	-1,
+	biology.nomenclature:UlexGallii     |	-1,
+	biology.nomenclature:Carex    		|	-8,
+	biology.nomenclature:Gramineae      |	-1,
+	biology.nomenclature:UlexEuropaeus  |	0	
+}};
+
+define T_T_ONE as {{	
+	com									|		t_one	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	3,
+	biology.nomenclature:FestucaRubra	|	4,
+	biology.nomenclature:Helictotrichon |	4,
+	biology.nomenclature:Phragmites     |	4,
+	biology.nomenclature:Polypodiopsida |	9,
+	biology.nomenclature:Senecio   		|	4,
+	biology.nomenclature:UlexGallii     |	4,
+	biology.nomenclature:Carex    		|	4,
+	biology.nomenclature:Gramineae      |	4,
+	biology.nomenclature:UlexEuropaeus  |	8	
+}};
+
+define T_ST_ZERO as {{	
+	com									|		st_zero	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	0.5,
+	biology.nomenclature:FestucaRubra	|	0.5,
+	biology.nomenclature:Helictotrichon |	0.5,
+	biology.nomenclature:Phragmites     |	0.5,
+	biology.nomenclature:Polypodiopsida |	0.5,
+	biology.nomenclature:Senecio   		|	0.5,
+	biology.nomenclature:UlexGallii     |	0.5,
+	biology.nomenclature:Carex    		|	0.5,
+	biology.nomenclature:Gramineae      |	0.5,
+	biology.nomenclature:UlexEuropaeus  |	0.5			
+}};
+
+define T_ST_ONE as {{	
+	com									|		st_one	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	0,
+	biology.nomenclature:FestucaRubra	|	0,
+	biology.nomenclature:Helictotrichon |	0,
+	biology.nomenclature:Phragmites     |	0,
+	biology.nomenclature:Polypodiopsida |	0,
+	biology.nomenclature:Senecio   		|	0,
+	biology.nomenclature:UlexGallii     |	0,
+	biology.nomenclature:Carex    		|	0,
+	biology.nomenclature:Gramineae      |	0,
+	biology.nomenclature:UlexEuropaeus  |	0			
+}};	
+
+define T_BIOV as {{	
+	com									|		remv_biovta	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	100,
+	biology.nomenclature:FestucaRubra	|	50,
+	biology.nomenclature:Helictotrichon |	40,
+	biology.nomenclature:Phragmites     |	90,
+	biology.nomenclature:Polypodiopsida |	0.1,
+	biology.nomenclature:Senecio   		|	10,
+	biology.nomenclature:UlexGallii     |	50,
+	biology.nomenclature:Carex    		|	10,
+	biology.nomenclature:Gramineae      |	80,
+	biology.nomenclature:UlexEuropaeus  |	100	
+}};
+
+
+/*
+ * VEGETATION GROWTH
+ */
+ 
+define T_CREC as {{	
+	com									|		xf	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna		|3,
+	biology.nomenclature:FestucaRubra	|10,
+	biology.nomenclature:Helictotrichon |7,
+	biology.nomenclature:Phragmites     |6,
+	biology.nomenclature:Polypodiopsida |5,
+	biology.nomenclature:Senecio   		|4,
+	biology.nomenclature:UlexGallii		|5,
+	biology.nomenclature:Carex    		|4,
+	biology.nomenclature:Gramineae      |8,
+	biology.nomenclature:UlexEuropaeus  |6
+}};
+
+define T_RAR as {{	
+	com									|		rar	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna       	|	0.5,
+	biology.nomenclature:FestucaRubra	|	0.35,
+	biology.nomenclature:Helictotrichon |	0.45,
+	biology.nomenclature:Phragmites     |	0.35,
+	biology.nomenclature:Polypodiopsida |	0.35,
+	biology.nomenclature:Senecio   		|	0.35,
+	biology.nomenclature:UlexGallii     |	0.35,
+	biology.nomenclature:Carex    		|	0.45,
+	biology.nomenclature:Gramineae      |	0.35,
+	biology.nomenclature:UlexEuropaeus  |	0.35	
+}};
+
+define T_DDCREC as {{	
+	com									|		ddcrec	
+	------------------------------------------------------------------------
+	biology.nomenclature:Calluna        |10000,
+	biology.nomenclature:FestucaRubra	|10000,
+	biology.nomenclature:Helictotrichon |10000,
+	biology.nomenclature:Phragmites     |10000,
+	biology.nomenclature:Polypodiopsida |2200,
+	biology.nomenclature:Senecio   		|10000,
+	biology.nomenclature:UlexGallii     |10000,
+	biology.nomenclature:Carex    		|10000,
+	biology.nomenclature:Gramineae      |10000,
+	biology.nomenclature:UlexEuropaeus  |10000	
+}};

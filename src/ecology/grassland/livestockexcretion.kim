@@ -1,0 +1,208 @@
+namespace ecology.grassland.livestockexcretion
+	using (T_PROBH)
+		from ecology.grassland.livestock.tables;
+		
+//-------------------------------------------- tables --------------------------------------------//
+
+model occurrence of biology.incubation:Excretion named probh
+'Probability of manure left in a plant community compared to its use'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_PROBH;
+	
+
+//-------------------------------------------- constant --------------------------------------------//
+
+number qm 
+'Coefficient of energy metabolism'
+	set to 0.8;
+
+//-------------------------------------------- models --------------------------------------------//	
+
+/*
+ * Solid Manure
+ */
+
+@intensive(space)
+model chemistry:Nitrogen biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Cattle physical:Solid agriculture:Manure in g/m^2 named nhvhcift_c
+'Nitrogen mass of living biomass in manure'
+ 	observing
+ 		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digv_c,
+ 		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla, 
+ 		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g/m^2 named ivhcift_c
+ 	set to [(1 - digv_c)*npla*ivhcift_c];
+
+@intensive(space)
+model chemistry:Nitrogen biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture.incubation:Mares physical:Solid agriculture:Manure in g/m^2 named nhvhcift_m
+'Nitrogen mass of living biomass in manure'
+ 	observing
+ 		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digv_m, 
+ 		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+ 		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion named ivhcift_m
+ 	set to [def a = 1-digv_m
+ 			def b = a*npla
+ 			def c = ivhcift_m*b
+ 			return c
+ 	];
+
+
+@intensive(space)
+model chemistry:Nitrogen not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Cattle physical:Solid agriculture:Manure in g/m^2 named nhmhcift_c
+'Nitrogen content of non-living  AboveGroundBiomass caused by Cattle Solid Manure'
+	observing
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digm,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm, 
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion named imhcift
+	set nhecesmhif to [(1-digm)*npla*prtvm] //'Nitrogeno en heces parte muerta por reba�o'
+	set to [imhcift*nhecesmhif];
+
+@intensive(space)
+model chemistry:Nitrogen not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture.incubation:Mares physical:Solid agriculture:Manure in g/m^2 named nhmhcift_m
+'Nitrogen content of non-living  AboveGroundBiomass caused by Cattle Solid Manure'
+	observing
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digm,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm,
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion named imhcift
+	set nhecesmhif to [(1-digm)*npla*prtvm] //'Nitrogeno en heces parte muerta por reba�o'
+	set to [imhcift*nhecesmhif];
+
+@intensive(space)
+model agriculture:Cattle physical:Solid agriculture:Manure im:Mass in g/m^2 named hnum_cattle
+'Livestock Solid Manure'
+	observing 
+		ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g/m^2 named ihcift_c,
+		occurrence of biology.incubation:Excretion named probh
+	set to [(ihcift_c*probh)]; 
+
+@intensive(space)	
+model agriculture.incubation:Mares physical:Solid agriculture:Manure im:Mass in g/m^2 named hnum_mares
+'Livestock Solid Manure'
+	observing 
+		ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g/m^2 named ihcift_m,
+		occurrence of biology.incubation:Excretion named probh
+	set to [(ihcift_m*probh)]; //by herd
+
+@intensive(space)
+model proportion of ecology:AboveGroundBiomass in agriculture:Livestock biology.incubation:IngestedFood named prh
+'proportion of Biomass in Livestock IngestedFood'
+	observing
+		agriculture:Cattle physical:Solid agriculture:Manure im:Mass in g/m^2 named hnum_cattle,
+		agriculture.incubation:Mares physical:Solid agriculture:Manure im:Mass in g/m^2 named hnum_mares
+	set to [(hnum_cattle + hnum_mares)]; //in case diferent herd--> prH:=ifelse((sum(hnum))==0,0,hnum/(sum(hnum)))]
+
+model chemistry:Nitrogen ecology:AboveGroundBiomass caused by agriculture:Livestock physical:Solid agriculture:Manure named nhh_cift
+'Nitrogen AboveGroundBiomass caused by Livestock Solid Manure'
+	observing
+		chemistry:Nitrogen biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Cattle physical:Solid agriculture:Manure named nhvhcift_c,
+		chemistry:Nitrogen biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture.incubation:Mares physical:Solid agriculture:Manure named nhvhcift_m,
+		chemistry:Nitrogen not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Cattle physical:Solid agriculture:Manure named nhmhcift_c,
+		chemistry:Nitrogen not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture.incubation:Mares physical:Solid agriculture:Manure named nhmhcift_m
+	set to [nhvhcift_c+nhvhcift_m+nhmhcift_c+nhmhcift_m];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass physical:Solid agriculture:Manure in g/m^2 named nhift
+'Nitrogen concentration of solid manure'
+	observing
+		chemistry:Nitrogen ecology:AboveGroundBiomass caused by agriculture:Livestock physical:Solid agriculture:Manure named nhhct,
+		proportion of ecology:AboveGroundBiomass in agriculture:Livestock biology.incubation:IngestedFood named prh 
+set to [nhhct*prh];
+
+@intensive(space)
+model proportion of chemistry:Nitrogen in physical:Solid agriculture:Manure named prnhift
+'Proportion of nitrogen in manure '
+	observing
+		landcover:Pastureland biology.incubation:Living ecology:AboveGroundBiomass causing biology.incubation:Ingestion in g/m^2 named ivift,
+		landcover:Pastureland not biology.incubation:Living ecology:AboveGroundBiomass causing biology.incubation:Ingestion in g/m^2 named imift,
+		chemistry:Nitrogen im:Mass physical:Solid agriculture:Manure in g/m^2 named nhift
+	set to [((ivift+imift)==0) ? 0 : (nhift / (ivift+imift))];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass caused by physical:Solid agriculture:Manure biology.incubation:Excretion in g/m^2 named nhgm2ift
+'Spatial distribution of solid manure nitrogen concentration'
+//	observing
+//		proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:Ingestion named ivgm2ift,
+//		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in im:Previous biology.incubation:Ingestion named imgm2ift,
+//		proportion of chemistry:Nitrogen in physical:Solid agriculture:Manure named prnhift
+	set to [0];
+//	over time 
+//		set to [(ivgm2ift+imgm2ift)*prnhift];
+
+
+/*
+ * Liquid Manure
+ */
+ 
+@intensive(space)
+model chemistry:Nitrogen biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Cattle physical:Liquid agriculture:Manure in g/m^2 named novhcift_c
+'Nitrogen concentration of liquid manure caused by aboveground biomass ingestion'
+	observing
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digv,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		qm,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g/m^2 named ivhcift_c
+	set to [ivhcift_c*digv*(1-qm)*npla];
+
+
+model chemistry:Nitrogen biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture.incubation:Mares physical:Liquid agriculture:Manure named novhcift_m 
+'Nitrogen concentration of liquid manure caused by aboveground biomass ingestion'
+	observing
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digv,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		qm,
+		biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named ivhcift_m
+	set to [ivhcift_m*digv*(1-qm)*npla];	
+		 
+@intensive(space) 
+model chemistry:Nitrogen not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Cattle physical:Liquid agriculture:Manure named nomhcift_c
+'Nitrogen concentration of liquid manure caused by total of non living aboveground biomass ingestion'
+	observing
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Cattle biology.incubation:Digestion named digm_c, //Digestibilidad de la biomasa a�rea muerta
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm,
+		qm,
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture:Cattle biology.incubation:Ingestion in g/m^2  named imhcift_c
+	set to [imhcift_c*digm_c*(1-qm)*npla*prtvm];
+
+
+model chemistry:Nitrogen not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture.incubation:Mares physical:Liquid agriculture:Manure named nomhcift_m
+'Nitrogen concentration of liquid manure caused by total of non living aboveground biomass ingestion'
+	observing
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture.incubation:Mares biology.incubation:Digestion named digm_m, //Digestibilidad de la biomasa a�rea muerta
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm,
+		qm,
+		not biology.incubation:Living ecology:AboveGroundBiomass causing agriculture.incubation:Mares biology.incubation:Ingestion in g named imhcift_m
+	set to [imhcift_m*digm_m*(1-qm)*npla*prtvm];
+
+
+model chemistry:Nitrogen ecology:AboveGroundBiomass caused by physical:Liquid agriculture:Manure named nohcift
+'Nitrogen concentration of liquid manure caused by total of aboveground biomass ingestion'
+	observing
+		chemistry:Nitrogen biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Cattle physical:Liquid agriculture:Manure named novhcif_c,
+		chemistry:Nitrogen not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Cattle physical:Liquid agriculture:Manure named novhcif_m,
+		chemistry:Nitrogen biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture.incubation:Mares physical:Liquid agriculture:Manure named nomhcif_c,
+		chemistry:Nitrogen not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture.incubation:Mares physical:Liquid agriculture:Manure named nomhcif_m,
+		proportion of ecology:AboveGroundBiomass in agriculture:Livestock biology.incubation:IngestedFood named prh
+	set to [def nohct = novhcif_c + novhcif_m + nomhcif_c + nomhcif_m
+			def result = nohct*prh
+			return result]; 
+
+@intensive(space)
+model proportion of chemistry:Nitrogen in physical:Liquid agriculture:Manure named prnoift
+'Proportion of nitrogen in liquid part of manure'
+	observing
+		landcover:Pastureland biology.incubation:Living ecology:AboveGroundBiomass causing biology.incubation:Ingestion in g/m^2 named ivift,
+		landcover:Pastureland not biology.incubation:Living ecology:AboveGroundBiomass causing biology.incubation:Ingestion in g/m^2 named imift,
+		chemistry:Nitrogen ecology:AboveGroundBiomass caused by physical:Liquid agriculture:Manure named nohcift
+	set to [((ivift+imift)==0) ? 0 : (nohcift/(ivift+imift))];
+
+@intensive(space)
+model chemistry:Nitrogen im:Mass caused by physical:Liquid agriculture:Manure biology.incubation:Excretion in g/m^2 named nogm2ift
+'Concentration of nitrogen in liquid manure'
+	observing
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:Ingestion named ivgm2ift,
+		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:Ingestion named imgm2ift,
+		proportion of chemistry:Nitrogen in physical:Liquid agriculture:Manure named prnoift
+	set to [(ivgm2ift+imgm2ift)*prnoift];
+

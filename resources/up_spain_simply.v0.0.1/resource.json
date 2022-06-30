@@ -1,0 +1,51 @@
+{
+  "urn" : "local:amarquez:im.ecology.grassland.livestock:up_spain_simply",
+  "version" : "0.0.1",
+  "adapterType" : "vector",
+  "localPath" : "im.ecology.grassland.livestock/resources/up_spain_simply.v0.0.1",
+  "geometry" : "#s2(233){bbox=[-4.021239850615833 -3.296028348313493 43.038716940834895 43.437248032715786],proj=EPSG:4326}",
+  "projectName" : "im.ecology.grassland.livestock",
+  "localName" : "up_spain_simply.shp",
+  "type" : "OBJECT",
+  "resourceTimestamp" : 1579089515070,
+  "metadata" : {
+    "im:keywords" : "features,up_spain_simply",
+    "dc:title" : "up_spain_simply"
+  },
+  "parameters" : { },
+  "localPaths" : [ "im.ecology.grassland.livestock/resources/up_spain_simply.v0.0.1/up_spain_simply.prj", "im.ecology.grassland.livestock/resources/up_spain_simply.v0.0.1/up_spain_simply.dbf", "im.ecology.grassland.livestock/resources/up_spain_simply.v0.0.1/up_spain_simply.shp", "im.ecology.grassland.livestock/resources/up_spain_simply.v0.0.1/up_spain_simply.shx" ],
+  "history" : [ ],
+  "notifications" : [ ],
+  "attributes" : [ {
+    "name" : "up",
+    "type" : "TEXT",
+    "key" : false,
+    "optional" : true,
+    "exampleValue" : null
+  }, {
+    "name" : "cattle",
+    "type" : "TEXT",
+    "key" : false,
+    "optional" : true,
+    "exampleValue" : null
+  }, {
+    "name" : "mares",
+    "type" : "TEXT",
+    "key" : false,
+    "optional" : true,
+    "exampleValue" : null
+  } ],
+  "spatialExtent" : {
+    "east" : -3.296028348313493,
+    "west" : -4.021239850615833,
+    "north" : 43.437248032715786,
+    "south" : 43.038716940834895,
+    "gridResolution" : null,
+    "gridUnit" : null
+  },
+  "dependencies" : null,
+  "outputs" : null,
+  "exportFormats" : {
+    "shp" : "ESRI shapefile"
+  }
+}

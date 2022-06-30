@@ -1,0 +1,32 @@
+{
+  "urn" : "local:amarquez:im.ecology.grassland.livestock:mintemp_may2012",
+  "version" : "0.0.1",
+  "adapterType" : "raster",
+  "localPath" : "im.ecology.grassland.livestock/resources/mintemp_may2012.v0.0.1",
+  "geometry" : "S2(79,54){bbox=[-1.805 -1.0150000000000001 48.195 48.735],proj=EPSG:4326}",
+  "projectName" : "im.ecology.grassland.livestock",
+  "localName" : "mintemp_may2012.tif",
+  "type" : "NUMBER",
+  "resourceTimestamp" : 1599037075099,
+  "metadata" : { },
+  "parameters" : {
+    "nodata" : "-3.3999999521443642E38"
+  },
+  "localPaths" : "im.ecology.grassland.livestock/resources/mintemp_may2012.v0.0.1/mintemp_may2012.tif",
+  "history" : [ ],
+  "notifications" : [ ],
+  "attributes" : [ ],
+  "spatialExtent" : {
+    "east" : -1.0150000000000001,
+    "west" : -1.805,
+    "north" : 48.735,
+    "south" : 48.195,
+    "gridResolution" : null,
+    "gridUnit" : null
+  },
+  "dependencies" : null,
+  "outputs" : null,
+  "exportFormats" : {
+    "tiff" : "GeoTiff"
+  }
+}

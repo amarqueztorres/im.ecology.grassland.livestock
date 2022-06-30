@@ -1,0 +1,38 @@
+{
+  "grassland.radiation.vegetationlimiting#Definition#Results" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "RESULTS",
+    "section" : "Results",
+    "documentedId" : "grassland.radiation.vegetationlimiting",
+    "extended" : null,
+    "template" : "@section(Radiation Limiting Factor)\r\n\r\n---\r\n@figure(self, Radiation Limiting Factor)\r\n---\r\n\r\n@link(self, Radiation Limiting Factor) shows the radiation growth limitation in a range between 0 and 1. 0 indicates no growth and 1 maximum growth.",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.radiation.vegetationlimiting#Definition#Introduction" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "INTRODUCTION",
+    "section" : "Introduction",
+    "documentedId" : "grassland.radiation.vegetationlimiting",
+    "extended" : null,
+    "template" : "@require(im.ecology.grassland.livestock.introduction, Introduction) (@cite(Busqué2014), @cite(Villa2007), @cite(Villa2017))\r\n\r\n@require(im.ecology.grassland.livestock.vegetationlimiting, Introduction)\r\n\r\n@section(Radiation Limiting Factor)\r\n",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.radiation.vegetationlimiting#Definition#Methods" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "METHODS",
+    "section" : "Methods",
+    "documentedId" : "grassland.radiation.vegetationlimiting",
+    "extended" : null,
+    "template" : "@section(Limiting Factor of Vegetation Growth)\r\n\r\n@section(Radiation Limiting Factor)\r\n\r\nThe \"SolarRadiation VegetationLimitingFactor causing Vegetation Growth\" model of Radiation module limits the plant growth according to the hours of light @cite(Coughenour1994) . This coefficient is in a range between 0 and 1 . Zero indicates lack of light causing the absence of growth while one indicates that the situation is optimal and consequently, the real growth is equal to the potential growth (if there is no other limitation). \r\n\r\nThe k.LAB models involved in this algorithm are:\r\n*value of SolarRadiation over Vegetation (Radiation module),\r\n*Maximum AtmosphericTemperature causing Vegetation Growth in MJ/m^2 (Radiation module)\r\n",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  }
+}

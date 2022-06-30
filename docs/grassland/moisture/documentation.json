@@ -1,0 +1,38 @@
+{
+  "grassland.moisture.vegetationlimiting#Definition#Results" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "RESULTS",
+    "section" : "Results",
+    "documentedId" : "grassland.moisture.vegetationlimiting",
+    "extended" : null,
+    "template" : "@section(Moisture Limiting Factor)\r\n\r\n---\r\n@figure(self, Moisture Limiting Factor)\r\n---\r\n\r\n@link(self, Moisture Limiting Factor)  shows the mositure growth limitation in a range between 0 and 1. 0 indicates no growth and 1 maximum growth.",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.moisture.vegetationlimiting#Definition#Methods" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "METHODS",
+    "section" : "Methods",
+    "documentedId" : "grassland.moisture.vegetationlimiting",
+    "extended" : null,
+    "template" : "@section(Limiting Factor of Vegetation Growth)\r\n@section(Moisture Limiting Factor)\r\n\r\nGrowth limitation due to lack of water is calculated through the \"Moisture VegetationLimitingFactor causing Vegetation Growth\" model @cite(Allen1998). This model ranges from 0 (limitation of growth due to water stress) to 1 (no limitation of growth due to water). It is based on the model that calculates the degree of water depletion in the root zone, depending on whether the water is at maximum field capacity or reaches its wilt point. Moreover, it is necessary to calculate a balance between inputs (precipitation) and outputs (percolation and evapotranspiration) as well as depth of roots, atmospheric temperature or soil texture.",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.moisture.vegetationlimiting#Definition#Introduction" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "INTRODUCTION",
+    "section" : "Introduction",
+    "documentedId" : "grassland.moisture.vegetationlimiting",
+    "extended" : null,
+    "template" : "@require(im.ecology.grassland.livestock.introduction, Introduction) (@cite(Busqué2014), @cite(Villa2007), @cite(Villa2017))\r\n\r\n@require(im.ecology.grassland.livestock.vegetationlimiting, Introduction)\r\n\r\n@section(Moisture Limiting Factor)\r\n",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  }
+}

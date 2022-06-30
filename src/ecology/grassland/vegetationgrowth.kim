@@ -1,0 +1,187 @@
+namespace ecology.grassland.vegetationgrowth
+	using (T_CREC, T_RAR, T_DDCREC)
+		from ecology.grassland.livestock.tables;
+		
+
+//-------------------------------------------- tables --------------------------------------------//
+@intensive(space)
+model im:Maximum ecology:Biomass caused by biology:Growth in g/m^2 named xf
+'Theoretical vegetation growth without limitations'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_CREC; 
+
+model proportion of ecology:RootBiomass in im:Balance ecology:Vegetation named rar
+'Relation between the growth of aerial and root system '
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_RAR;
+
+
+model im:Added earth:AtmosphericTemperature causing im:Active biology:Growth in Celsius named ddcrec
+'Growing degree days (GDD) accumulated, a commonly used measure of thermal accumulation'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_DDCREC;
+
+
+//-------------------------------------------- models --------------------------------------------//
+
+model im:Added earth:AtmosphericTemperature causing ecology.incubation:PhenologyActivity in Celsius named ti
+'Accumulated temperature necessary to complete a phenological state'
+	observing
+		earth:AtmosphericTemperature for ecology:Vegetation in Celsius named tmed2 
+	set to [(tmed2 < 4) ? 0 : tmed2];
+//	over time 
+		//set to [ ti + ti@previous];
+		
+model occurrence of ecology.incubation:PhenologyActivity named ph
+'Phenological state of vegetation'
+	observing
+		im:Added earth:AtmosphericTemperature causing ecology.incubation:PhenologyActivity named ti,
+		im:Added earth:AtmosphericTemperature causing im:Active biology:Growth in Celsius named ddcrec
+	set to [		
+		(ti < ddcrec) ? 1 : 0
+	];
+	
+/*
+ * Potential Grow of aerial and root part
+ */
+
+@intensive(space)	
+model im:Potential ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named crecpot
+'AboveGroundBiomass caused by Potential Growth'
+	observing	
+		im:Maximum ecology:Biomass caused by biology:Growth in g/m^2 named xf,
+		percentage of ecology:Vegetation biology:Growth caused by ecology:VegetationLimitingFactor named ftrh,
+		occurrence of ecology.incubation:PhenologyActivity named ph
+	set to [xf*ftrh*ph];
+	
+@intensive(space)	
+model im:Potential ecology:RootBiomass caused by biology:Growth in g/m^2 named crecpotr
+'Potential growth of below ground biomass'
+	observing 
+		im:Potential ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named crecpot,
+		proportion of ecology:RootBiomass in im:Balance ecology:Vegetation named rar 
+	set to [def raiz = rar/(1-rar)
+			def crec = crecpot*raiz		
+			return crec];
+	
+		
+/*
+ *  Growth compensation and nitrogen reabsorption
+ */
+
+@intensive(space)
+number comp
+'Function to compute compa and compr'
+ observing
+	biology.incubation:Living ecology:RootBiomass in g/m^2 named biovr,
+	proportion of ecology:RootBiomass in ecology:Vegetation im:Balance named rar,
+	biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov
+set to  [def a = rar/(1-rar)
+		 def b = biovr-a
+		 def c = b*biov
+		 return c];
+
+@intensive(space)
+number npos
+'Function that sums nres (nitrogen causing vegetation growth) and mnim (inorganic nitrogen)'
+	observing
+		chemistry:Inorganic chemistry:Nitrogen im:Mass in g/m^2 named nmin,		
+		chemistry:Nitrogen im:Mass of biology:Plant causing biology:Growth in g/m^2 named nres	
+	set to [nmin+nres];
+
+model ecology:Vegetation im:Balance of ecology.incubation:AerialPlantPart causing biology:Growth named compa
+'The remainder of net primary production is used for aerial vegetation growth.'
+	observing
+		comp
+	set to [0];
+//	over time
+//		set to [(comp > 0) ? comp : 0];
+
+model ecology:Vegetation im:Balance of ecology.incubation:Root causing biology:Growth named compr
+'The remainder of net primary production used for root growth'
+	observing
+		comp
+	set to [0];
+//	over time
+//		set to [comp < 0 ? (comp*(-1)) : 0];
+
+number comphechoa 
+'Function to calculate comphechoa1'
+	observing 
+		ecology:Vegetation im:Balance of ecology.incubation:AerialPlantPart causing biology:Growth named compa,
+		npos,	
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla
+	set to [(npos > (compa*npla)) ? compa : (npos/npla)];
+	
+@intensive(space)
+model chemistry:Nitrogen im:Balance of ecology.incubation:AerialPlantPart caused by biology:Growth named comphechoa1
+'Normalised concentration of nitrogen in the aerial part of the plant'
+	observing
+		comphechoa,
+		im:Potential ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named crecpot
+	set to [(comphechoa > crecpot) ? crecpot : comphechoa];
+
+
+number comphechor
+'Function to calculate comphechoar1'
+	observing 
+		ecology:Vegetation im:Balance of ecology.incubation:Root causing biology:Growth named compr,
+		npos,	
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla
+	set to [npos>(compr*npla) ? compr : npos/npla];
+
+@intensive(space)
+model chemistry:Nitrogen im:Balance of ecology.incubation:Root caused by biology:Growth named comphechor1 
+'Normalised concentration of nitrogen in the root part of the plant'
+	observing
+		comphechor,
+		im:Potential ecology:RootBiomass caused by biology:Growth in g/m^2 named crecpotr
+	set to [(comphechor > crecpotr) ? crecpotr : comphechor];	  
+
+
+/*
+ *  Real Growth 
+ */
+
+number nsop 
+'Function to calculate adic'
+	observing
+		npos,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		chemistry:Nitrogen im:Balance of ecology.incubation:AerialPlantPart caused by biology:Growth named comphechoa1, 
+		chemistry:Nitrogen im:Balance of ecology.incubation:Root caused by biology:Growth named comphechor1
+	set to [npos-comphechoa1*npla-comphechor1*npla];
+
+@intensive(space)
+model proportion of chemistry:Nitrogen causing im:Added biology:Growth named adic
+'Proportion of the remainder nitrogen causing extra vegetation growth'
+	observing
+		npos,
+		proportion of chemistry:Nitrogen in biology.incubation:Living ecology:AboveGroundBiomass named npla,
+		im:Potential ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named crecpot, 
+		chemistry:Nitrogen im:Balance of ecology.incubation:AerialPlantPart caused by biology:Growth named comphechoa1, 
+		chemistry:Nitrogen im:Balance of ecology.incubation:Root caused by biology:Growth named comphechor1,
+		nsop
+	set to [nsop > ((crecpot-comphechoa1-comphechor1)*npla) ? (crecpot-comphechoa1-comphechor1) : (nsop/npla)];
+
+@documented('grassland.vegetationgrowth.aerialgrowth')
+@intensive(space)
+model ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named creca
+'Actual growth of above ground biomass'
+	observing
+		chemistry:Nitrogen im:Balance of ecology.incubation:AerialPlantPart caused by biology:Growth named comphechoa1,
+		proportion of chemistry:Nitrogen causing im:Added biology:Growth named adic,
+		proportion of ecology:RootBiomass in im:Balance ecology:Vegetation named rar 
+
+	set to [comphechoa1 + adic*(1-rar)];
+
+@documented('grassland.vegetationgrowth.rootgrowth') 
+@intensive(space)
+model ecology:RootBiomass caused by biology:Growth in g/m^2 named crecr
+'Actual growth of below ground biomass'
+	observing
+		chemistry:Nitrogen im:Balance of ecology.incubation:Root caused by biology:Growth named comphechor1,
+		proportion of chemistry:Nitrogen causing im:Added biology:Growth named adic,
+		proportion of ecology:RootBiomass in im:Balance ecology:Vegetation named rar 
+		//root part growth depend on aerial-root balance
+	set to [comphechor1 + adic*rar];

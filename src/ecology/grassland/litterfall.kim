@@ -1,0 +1,190 @@
+namespace ecology.grassland.litterfall
+	using (T_BIOD, T_BIOM, T_BIOMR, T_FMX, T_FMN)
+	 from ecology.grassland.livestock.tables;
+	 
+//-------------------------------------tables-------------------------------------//
+
+@intensive(space)
+model im:Previous ecology.incubation:Litter ecology:AboveGroundBiomass in g/m^2 named biodta
+'Amount of litterfall related to above ground biomass at time = 0'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_BIOD;
+		
+@intensive(space)
+model im:Previous not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biomta
+'Dead standing above ground biomass  at time = 0'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_BIOM;
+
+@intensive(space)
+model im:Previous not biology.incubation:Living ecology:RootBiomass in g/m^2 named biomrta
+'Dead standing root biomass at time = 0'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_BIOMR;
+
+model proportion of im:Maximum ecology.incubation:Litterfall in not biology.incubation:Living ecology:AboveGroundBiomass named fmx
+'Maximum proportion of litterfall caused by livestock'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_FMX;
+
+model proportion of im:Minimum ecology.incubation:Litterfall in not biology.incubation:Living ecology:AboveGroundBiomass named fmn
+'Minimum proportion of litterfall caused by livestock'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_FMN;
+	
+	
+//-------------------------------------constants-------------------------------------//
+
+@intensive(space)
+number biov00
+'Living standing biomass remaining after harvest'
+	set to 5;
+
+@intensive(space)
+number biom00
+'Standing dead biomass remaining after harvest'
+	set to 10;
+	
+number dr 
+'Rate of root litterfall'
+	set to 0.2; 
+
+model proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Harvesting named ksv
+'Harvesting efficiency of living above ground biomass'
+	set to [0.9];
+
+model proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Harvesting named ksm
+'Harvesting efficiency of dead above ground biomass'
+	set to [0.8];
+
+model proportion of ecology:AboveGroundBiomass in im:Maximum ecology.incubation:Litterfall named pimx 
+'Proportion of ingested biomass by livestock with maximum fall'
+	set to [0.05];
+
+model proportion of ecology:AboveGroundBiomass in im:Minimum ecology.incubation:Litterfall named pimn
+'Proportion of ingested biomass by livestock with minimum fall'
+	set to [0];
+
+
+//-------------------------------------models-------------------------------------//
+
+/*
+ * Harvesting process
+ */ 
+ 
+@intensive(space)
+model biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named svgm 
+'Amount of living biomass harvested'
+	observing	
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov,
+		biov00,
+		proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Harvesting named ksv
+	set to [
+		(biov00 == null) ? 0 : (
+			((ksv * biov) > biov00) ? ((ksv * biov) - biov00) :
+			0
+		)];
+
+@intensive(space)
+model not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named smgm
+'Amount of dead biomass harvested'
+	observing
+		im:Previous not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom,
+	 	biom00,
+ 		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Harvesting named ksm
+	set to [(biom00 == null)  ? 0 : (
+			((ksm * biom) > biom00) ? ((ksm * biom) - biom00) : 0
+		)];
+		
+
+/*
+ * Litterfall process 
+ */ 
+ 
+@intensive(space)
+model ecology:AboveGroundBiomass caused by ecology.incubation:Litterfall in g/m^2 named desf
+'Process of litterfall related to above ground biomass'
+	observing
+		proportion of im:Maximum ecology.incubation:Litterfall in not biology.incubation:Living ecology:AboveGroundBiomass named fmx,
+		proportion of im:Minimum ecology.incubation:Litterfall in not biology.incubation:Living ecology:AboveGroundBiomass named fmn,
+//		proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:Ingestion named ivgm2ift, 
+		proportion of ecology:AboveGroundBiomass in im:Maximum ecology.incubation:Litterfall named pimx,
+		proportion of ecology:AboveGroundBiomass in im:Minimum ecology.incubation:Litterfall named pimn,
+//	 	not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom,
+	 	im:Previous not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom,
+	 	proportion of biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Harvesting named ksv,
+ 		proportion of not biology.incubation:Living ecology:AboveGroundBiomass in agriculture:Harvesting named ksm,	
+ 		not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named smgm,
+ 		biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named svgm
+	set to [def dt =	(0<pimn) ? fmn : (
+						(0>pimx) ? fmx : (fmn + (((fmx-fmn)/(pimx-pimn))*(0-pimn))))
+			def result = (dt*biom) + (((1-ksv)*svgm) + ((1-ksm)*smgm))
+			return result]; //set to [f_desf * biomta + ((1-ksv)*svgm) + ((1-ksm)*smgm)];
+	//over time 
+//		set pi to [(biov==0) ? 0 : (ivgm2ift/biov)]
+//		set dt to [	if (pi<pimn){
+//						fmn
+//					}else if (pi>pimx){
+//						fmx
+//					}else{
+//						fmn+(((fmx-fmn)/(pimx-pimn) )*(pi-pimn))
+//					}]
+//		set to [(dt*biom) + (((1-ksv)*svgm) + ((1-ksm)*smgm))];
+	
+
+@intensive(space)	
+model ecology:RootBiomass caused by ecology.incubation:Litterfall in g/m^2 named desfr
+'Process of litterfall related to root biomass'
+	observing
+		not biology.incubation:Living ecology:RootBiomass in g/m^2 named biomr,
+		dr			
+	set to [biomr * dr]; 
+
+
+/*
+ * Dead Biomass
+ */ 
+ 
+@intensive(space)
+model not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biom
+'Dead standing above ground biomass '
+	observing 
+		im:Previous not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biomta
+//		im:Previous not biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biomta,
+//		ecology:AboveGroundBiomass caused by ecology.incubation:Senescence in g/m^2 named senes,
+//		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm,
+//		ecology:AboveGroundBiomass caused by ecology.incubation:Litterfall named desf,
+//		proportion of not biology.incubation:Living ecology:AboveGroundBiomass causing im:Previous biology.incubation:Ingestion named imgm2ift,
+//		not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named smgm,
+//		not biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named biom00
+	set to [biomta*1];
+	//over time
+	//		set to [ def harvest = (biom00 == null) ? biom : ((biom > biom00) ? biom00 : biom)
+//				 def hbiom = (harvest+(senes*(1-prtvm))-desf-imgm2ift-smgm)	
+//				 def result = (hbiom < 0) : 0 ? hbiom
+//				 return result
+//		];
+
+	
+@intensive(space)
+model not biology.incubation:Living ecology:RootBiomass in g/m^2 named biomr
+'Dead standing root biomass'
+	observing
+		im:Previous not biology.incubation:Living ecology:RootBiomass in g/m^2 named biomrta 
+//		ecology:RootBiomass caused by ecology.incubation:Senescence in g/m^2 named senesr,
+//		proportion of chemistry:Nitrogen im:Mass in ecology.incubation:Resorption named prtvm,
+//		ecology:RootBiomass caused by ecology.incubation:Litterfall named desfr
+	set to [biomrta];
+	//over time
+//		set to [biomr+(senescr*(1-prtvm))-desfr];
+
+@intensive(space)
+model ecology.incubation:Litter ecology:AboveGroundBiomass in g/m^2 named biod 
+'Amount of litterfall related to above ground biomass'
+	observing
+		im:Previous ecology.incubation:Litter ecology:AboveGroundBiomass in g/m^2 named biodta
+//		ecology:AboveGroundBiomass caused by ecology.incubation:Litterfall named desf,
+//		ecology:AboveGroundBiomass ecology.incubation:Litter causing im:Active ecology.incubation:Decomposition in g/m^2 named descd
+	set to [biodta];
+//	over time
+//		set to [biod + desf - descd];

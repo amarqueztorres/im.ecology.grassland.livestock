@@ -1,0 +1,142 @@
+namespace ecology.grassland.senescence
+	using (T_FHS, T_SH_ZERO, T_SH_ONE, T_T_ZERO, T_T_ONE, T_ST_ZERO, T_ST_ONE, T_BIOV)
+	 from ecology.grassland.livestock.tables;
+
+//-------------------------------------------- tables --------------------------------------------//
+
+model proportion of hydrology.incubation:Moisture causing im:Minimum ecology.incubation:Senescence named fhs
+'Level of moisture (fh) with minimum senescence'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_FHS;
+
+number sh0
+'Maximum proportion of leaves dying due to moisture'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_SH_ZERO;
+
+number sh1
+'Proportion of minimum leave senescence caused by soil moisture'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_SH_ONE;
+
+
+model earth:AtmosphericTemperature causing im:Maximum ecology.incubation:Senescence in Celsius named t0
+'Atmospheric temperature producing maximum senescence'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_T_ZERO;
+
+
+model earth:AtmosphericTemperature causing im:Minimum ecology.incubation:Senescence in Celsius named t1
+'Atmospheric temperature producing minimum senescence'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_T_ONE;
+
+number st0
+'Maximum proportion of leaves dying due to temperature'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_ST_ZERO;
+	
+number st1
+'Temperature causing minimal senescence'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_ST_ONE;
+
+@intensive(space)	
+model im:Previous biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biovta
+'Living above ground biomass at time = 0'
+	observing type of im:Relevant landcover:Pastureland biology:Plant named com
+	lookup (com) into T_BIOV;
+
+
+//-------------------------------------------- models --------------------------------------------//
+
+model ecology:Vegetation hydrology.incubation:Moisture causing ecology.incubation:Senescence named sh 
+'Proportion of leave senescence caused by moisture'
+	observing
+		percentage of ecology:Vegetation biology:Growth caused by hydrology.incubation:Moisture named fh,
+		proportion of hydrology.incubation:Moisture causing im:Minimum ecology.incubation:Senescence named fhs,
+		sh0,
+		sh1
+	set to [
+		(fh < 0) ? sh0 : (
+			(fh > fhs) ? sh1 :
+			(sh0 * (fhs - fh) - (sh1*(0 - fh)))/(fhs - 0))
+	];
+
+model ecology:Vegetation earth:AtmosphericTemperature causing ecology.incubation:Senescence named st
+'Proportion of senescence caused by temperature'
+	observing
+		im:Minimum earth:AtmosphericTemperature during earth:Snowy im:Season in Celsius named tminn,
+		earth:AtmosphericTemperature causing im:Maximum ecology.incubation:Senescence in Celsius named t0,
+		earth:AtmosphericTemperature causing im:Minimum ecology.incubation:Senescence in Celsius named t1,
+		st0,
+		st1
+	set to [
+		(tminn < t0) ? st0 : (
+			(tminn > t1) ? st1 :
+			(st0 * (t1 - tminn) - (st1*(t0 - tminn)))/(t1 - t0))
+	];
+	
+model proportion of not biology.incubation:Living ecology:Biomass caused by ecology.incubation:Senescence named prsen 
+'Maximum proportion of senescence caused by temperature or moisture'
+	observing
+		ecology:Vegetation hydrology.incubation:Moisture causing ecology.incubation:Senescence named sh,
+		ecology:Vegetation earth:AtmosphericTemperature causing ecology.incubation:Senescence  named st
+	set to [Math.max(sh,st)];
+
+
+/*
+ * Living Biomass
+ */
+ 
+@intensive(space)
+model biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov
+'Living above ground biomass'
+	observing
+		im:Previous biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biovta
+//		ecology:AboveGroundBiomass caused by biology:Growth in g/m^2 named crec,
+//		ecology:AboveGroundBiomass caused by ecology.incubation:Senescence in g/m^2 named senes,
+//		proportion of biology.incubation:Living ecology:AboveGroundBiomass in biology.incubation:Ingestion named ivgm2ift, 
+//		biology.incubation:Living ecology:AboveGroundBiomass caused by agriculture:Harvesting in g/m^2 named svgm
+	set to [biovta*1];
+//	over time
+//		set to [ def harvest = (biov00 == null) ? biov : ((biov > biov00) ? biov00 : biov)
+//				 def hbiov = harvest+crec-senes-ivgm2ift-svgm	
+//				 def result = (hbiov < 0) : 0 ? hbiov
+//				 return result
+//		];
+		
+	
+	
+@intensive(space)
+model biology.incubation:Living ecology:RootBiomass in g/m^2 named biovr
+	observing
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov,
+//		ecology:RootBiomass caused by ecology.incubation:Senescence in g/m^2 named senesr,
+//		ecology:RootBiomass caused by biology:Growth in g/m^2 named crecr,
+		proportion of ecology:RootBiomass in im:Balance ecology:Vegetation named rar
+	set to [biov*rar/(1-rar)]
+//	over time
+//		set to [biovr+crecr-senesr]
+		;
+
+/*
+ * Senescence - Death Process
+ */
+ 
+@intensive(space)
+model ecology:AboveGroundBiomass caused by ecology.incubation:Senescence in g/m^2 named senes
+'Amount of above ground biomass dying caused by senescence'
+	observing 
+		proportion of not biology.incubation:Living ecology:Biomass caused by ecology.incubation:Senescence named prsen,
+		biology.incubation:Living ecology:AboveGroundBiomass in g/m^2 named biov
+	set to [prsen*biov];
+
+
+@intensive(space)
+model ecology:RootBiomass caused by ecology.incubation:Senescence in g/m^2 named senesr
+'Amount of below ground biomass dying caused by senescence'
+	observing 
+		proportion of not biology.incubation:Living ecology:Biomass caused by ecology.incubation:Senescence named prsen,
+		biology.incubation:Living ecology:RootBiomass in g/m^2 named biovr
+	set to [prsen*biovr];

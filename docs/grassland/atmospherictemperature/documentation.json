@@ -1,0 +1,38 @@
+{
+  "grassland.atmospherictemperature.vegetationlimiting#Definition#Results" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "RESULTS",
+    "section" : "Results",
+    "documentedId" : "grassland.atmospherictemperature.vegetationlimiting",
+    "extended" : null,
+    "template" : "@section(Temperature Limiting Factor)\r\n\r\n---\r\n@figure(self, Temperature Limiting Factor)\r\n---\r\n\r\n@link(self, Temperature Limiting Factor) shows the likelihood of a flood occurring in each cell. Range data are between 0 to 1.",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.atmospherictemperature.vegetationlimiting#Definition#Methods" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "METHODS",
+    "section" : "Methods",
+    "documentedId" : "grassland.atmospherictemperature.vegetationlimiting",
+    "extended" : null,
+    "template" : "@section(Limiting Factor of Vegetation Growth)\r\n@section(Temperature Limiting Factor)\r\n\r\nThe \"AtmosphericTemperature VegetationLimitingFactor causing Vegetation Growth\" model calculates the effect of mean temperature (value of AtmosphericTemperature over Vegetation model) on vegetation growth @cite(Coughenour1994) . To be calculated, the models @cite(Tappeiner1998) are used:\r\n\r\n•\t\"AtmosphericTemperature causing Vegetation Growth\" model: Temperature that produces maximum growth\r\n\r\n•\t\"Minimum AtmosphericTemperature VegetationLimitingFactor causing Vegetation Growth\" model: Temperature below which vegetation stops growing \r\n\r\n•\t\"Maximum AtmosphericTemperature VegetationLimitingFactor causing Vegetation Growth\" model: Temperature above which vegetation stops growing\r\n\r\n",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  },
+  "grassland.atmospherictemperature.vegetationlimiting#Definition#Introduction" : {
+    "trigger" : "DEFINITION",
+    "sectionRole" : "INTRODUCTION",
+    "section" : "Introduction",
+    "documentedId" : "grassland.atmospherictemperature.vegetationlimiting",
+    "extended" : null,
+    "template" : "@require(im.ecology.grassland.livestock.introduction, Introduction) (@cite(Busqué2014), @cite(Villa2007), @cite(Villa2017))\r\n\r\n@require(im.ecology.grassland.livestock.vegetationlimiting, Introduction)\r\n\r\n@section(Temperature Limiting Factor)\r\n",
+    "sectionType" : "BODY",
+    "documentedUrns" : [ ],
+    "eventType" : null,
+    "variables" : { }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "Villa2007" : {
+    "examplecitation" : "Villa, Ferdinando. 2007. ‘A Semantic Framework and Software Design to Enable the Transparent Integration, Reorganization and Discovery of Natural Systems Knowledge’. Journal of Intelligent Information Systems 29 (1): 79–96. https://doi.org/10.1007/s10844-006-0032-x.",
+    "key" : "Villa2007"
+  },
+  "Villa2017" : {
+    "examplecitation" : "Villa, Ferdinando, Stefano Balbi, Ioannis N. Athanasiadis, and Caterina Caracciolo. 2017. ‘Semantics for Interoperability of Distributed Data and Models: Foundations for Better-Connected Information’. F1000Research 6 (May): 686.",
+    "key" : "Villa2017"
+  },
+  "im.ecology.grassland.livestock.introduction" : {
+    "examplecitation" : "The implementation of Puerto model @cite(Busqué2014) , referred to as the Pasture and Livestock (PaL) module(s), into a semantic-first modelling approach designed to make models and their results more accessible to end-users such as farmers, and policy-makers. PaL is written in k.IM: a semantic modelling language designed for the k.LAB modelling platform powered by artificial intelligence, and in particular machine reasoning, for the interoperability of data and models @cite(Villa2017) .",
+    "key" : "im.ecology.grassland.livestock.introduction"
+  },
+  "Coughenour1994" : {
+    "examplecitation" : "Coughenour, M.B. 1994. Savanna-Landscape and Regional Ecosystem Model. Model Description. Colorado State University. Colorado",
+    "key" : "Coughenour1994"
+  },
+  "MichaelisMenten1913" : {
+    "examplecitation" : "Michaelis L, Menten ML. Die Kinetik der Invertinwirkung. Biochemische Zeitschrift. 1913;49:333–369. [Google Scholar]",
+    "key" : "MichaelisMenten1913"
+  },
+  "im.ecology.grassland.livestock.vegetationlimiting" : {
+    "examplecitation" : "## Limiting Factor of Vegetation Growth\r\nThe vegetation growth limitation module is mainly composed of three models, with the possibility of adding a fourth one. The first three are closely linked to climatic factors, such as atmospheric temperature, soil moisture and incidence of solar radiation. The fourth limitation is linked to the nitrogen content in the soil that can be accessed by plants.",
+    "key" : "im.ecology.grassland.livestock.vegetationlimiting"
+  },
+  "Busqué2014" : {
+    "examplecitation" : "Busqué, Juan. 2014. ‘De la investigación a la práctica: herramientas para gestionar la ganadería de montaña y los pastos comunales de Cantabria dentro de la política agraria común’. Revista Pastos 6 (1): 6–42.",
+    "key" : "Busqué2014"
+  },
+  "Tappeiner1998" : {
+    "examplecitation" : "Tappeiner, Ulrike, and Alexander Cernusca. 1998. ‘Model Simulation of Spatial Distribution of Photosynthesis in Structurally Differing Plant Communities in the Central Caucasus’. Ecological Modelling 113 (1): 201–23.",
+    "key" : "Tappeiner1998"
+  },
+  "Allen1998" : {
+    "examplecitation" : "Allen, Richard G., Luis S. Pereira, Dirk Raes, and Martin Smith. 1998. Crop Evapotranspiration - Guidelines for Computing Crop Water Requirements - FAO Irrigation and Drainage Paper 56. FAO (Food and Agriculture Organization of the United Nation).",
+    "key" : "Allen1998"
+  }
+}
